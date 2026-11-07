@@ -1,0 +1,83 @@
+<section id="contacto" class="contacto">
+  <div class="container rejilla">
+    <div class="contacto-info">
+      <p class="insignia"><span aria-hidden="true"></span>Visítanos o escríbenos</p>
+      <h2>Contacto y ubicación</h2>
+      <p class="intro">
+        ¿Tienes una prenda que necesita un ajuste? Envíanos los detalles y te responderemos
+        por WhatsApp con una cotización clara, sin compromiso.
+      </p>
+
+      <div class="datos-taller">
+        <div class="dato">
+          <span class="dato-icono material-symbols-outlined" aria-hidden="true">location_on</span>
+          <div>
+            <h3>Dirección del taller</h3>
+            <p>Calle Ejemplo 123</p>
+            <small>Actualiza esta dirección con la ubicación real del taller.</small>
+          </div>
+        </div>
+        <div class="separador"></div>
+        <div class="dato">
+          <span class="dato-icono material-symbols-outlined" aria-hidden="true">schedule</span>
+          <div class="horarios">
+            <h3>Horario de atención</h3>
+            <p><span>Lunes a sábado</span><strong>9:00 a 18:00</strong></p>
+            <p class="nota-horario">Domingos y feriados: cerrado</p>
+          </div>
+        </div>
+        <div class="separador"></div>
+        <div class="dato dato-whatsapp">
+          <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+          <strong>Consultas directas por WhatsApp</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="formulario-panel">
+      <div class="formulario-cabecera">
+        <h3>Pide tu cotización rápida</h3>
+        <p>Completa estos datos y WhatsApp abrirá el mensaje listo para enviar.</p>
+      </div>
+
+      <form #f="ngForm" class="formulario" (ngSubmit)="enviar()">
+        <div class="campo">
+          <label for="nombre">Tu nombre completo <span aria-hidden="true">*</span></label>
+          <div class="campo-control">
+            <input id="nombre" name="nombre" type="text" autocomplete="name"
+                   placeholder="Ej. Carmen Rodríguez" [(ngModel)]="cliente.nombre" required>
+            <span class="material-symbols-outlined" aria-hidden="true">person</span>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="servicio">Servicio que necesitas <span aria-hidden="true">*</span></label>
+          <div class="campo-control">
+            <select id="servicio" name="servicio" [(ngModel)]="cliente.servicio" required>
+              <option value="" disabled>Selecciona un servicio...</option>
+              @for (servicio of servicios; track servicio) {
+                <option [value]="servicio">{{ servicio }}</option>
+              }
+              <option value="Otro tipo de costura especial">Otro tipo de costura especial</option>
+            </select>
+            <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="mensaje">Cuéntanos el detalle de la prenda</label>
+          <textarea id="mensaje" name="mensaje" rows="4"
+                    placeholder="Ej. Necesito ajustar la basta de un pantalón..."
+                    [(ngModel)]="cliente.mensaje"></textarea>
+          <small class="ayuda"><span class="material-symbols-outlined" aria-hidden="true">photo_camera</span>Si tienes fotos, podrás adjuntarlas en el chat de WhatsApp.</small>
+        </div>
+
+        <button class="boton whatsapp" type="submit" [disabled]="f.invalid">
+          <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+          Enviar por WhatsApp
+        </button>
+        <p class="respuesta-directa"><span aria-hidden="true"></span>Sin registros: atención directa del taller.</p>
+      </form>
+    </div>
+  </div>
+</section>

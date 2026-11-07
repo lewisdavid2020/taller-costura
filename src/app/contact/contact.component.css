@@ -1,0 +1,76 @@
+.contacto { padding: 3.5rem 0; border-top: 1px solid var(--linea); background: var(--rosa); }
+.rejilla { display: grid; align-items: start; gap: 2rem; }
+
+.contacto-info .insignia { margin-bottom: 0.9rem; }
+.contacto-info h2 { margin: 0 0 0.85rem; color: var(--tinta); font: 700 clamp(1.7rem, 4vw, 2.45rem)/1.25 var(--fuente-titulos); letter-spacing: -0.035em; }
+.intro { max-width: 48ch; margin: 0 0 1.6rem; color: var(--denim); font-size: 0.95rem; line-height: 1.7; }
+
+.datos-taller { display: grid; gap: 1rem; padding: 1.1rem; border: 2px dashed var(--linea-oscura); border-radius: 12px; background: var(--lino); }
+.dato { display: flex; align-items: flex-start; gap: 0.85rem; }
+.dato-icono { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--tinta); color: var(--cinta); font-size: 1.25rem; }
+.dato h3 { margin: 0 0 0.2rem; color: var(--tinta); font: 700 0.9rem/1.35 var(--fuente-titulos); }
+.dato p { margin: 0; color: var(--denim); font-size: 0.83rem; line-height: 1.5; }
+.dato small { display: block; margin-top: 0.25rem; color: #64708a; font-size: 0.68rem; }
+.separador { border-top: 1px dashed var(--linea); }
+.horarios p { display: flex; justify-content: space-between; gap: 1rem; }
+.horarios p strong { color: var(--tinta); font: 600 0.72rem var(--fuente-codigo); }
+.horarios .nota-horario { justify-content: flex-start; margin-top: 0.3rem; color: #64708a; font-size: 0.72rem; }
+.dato-whatsapp { align-items: center; color: var(--tinta); font-size: 0.78rem; }
+.dato-whatsapp > .material-symbols-outlined { color: var(--hilo); font-size: 1.2rem; }
+
+.formulario-panel { padding: 1.3rem; border: 1px solid var(--linea); border-radius: 14px; background: var(--lino); box-shadow: var(--sombra-suave); }
+.formulario-cabecera { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--linea); }
+.formulario-cabecera h3 { margin: 0 0 0.3rem; color: var(--tinta); font: 700 1.15rem/1.35 var(--fuente-titulos); }
+.formulario-cabecera p { margin: 0; color: var(--denim); font-size: 0.8rem; }
+.formulario { display: grid; gap: 1rem; }
+.campo { display: grid; gap: 0.4rem; }
+label { color: var(--tinta); font-size: 0.8rem; font-weight: 700; }
+label span { color: var(--hilo); }
+.campo-control { position: relative; }
+
+input, select, textarea {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 2.6rem 0.75rem 0.85rem;
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  outline: 0;
+  background: var(--salvia);
+  color: var(--tinta);
+  font: 400 0.9rem/1.5 var(--fuente-texto);
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+input::placeholder, textarea::placeholder { color: #9299a7; }
+input:focus, select:focus, textarea:focus { border-color: var(--tinta); background: var(--lino); box-shadow: 0 0 0 2px rgb(22 33 58 / 12%); }
+.campo-control > .material-symbols-outlined { position: absolute; top: 50%; right: 0.8rem; color: #71809c; font-size: 1.15rem; pointer-events: none; transform: translateY(-50%); }
+select { appearance: none; cursor: pointer; }
+textarea { min-height: 110px; padding-right: 0.85rem; resize: vertical; }
+.ayuda { display: flex; align-items: center; gap: 0.35rem; color: #64708a; font-size: 0.7rem; }
+.ayuda .material-symbols-outlined { color: var(--cinta-oscura); font-size: 0.95rem; }
+
+.boton.whatsapp {
+  width: 100%;
+  border: 0;
+  background: #25d366;
+  color: #fff;
+  font-size: 0.98rem;
+}
+.boton.whatsapp:hover:not(:disabled) { background: #20ba5a; }
+.boton.whatsapp:disabled { background: #8da49a; }
+.boton.whatsapp .material-symbols-outlined { font-size: 1.35rem; }
+.respuesta-directa { display: flex; align-items: center; justify-content: center; gap: 0.45rem; margin: -0.4rem 0 0; color: var(--denim); font-size: 0.7rem; text-align: center; }
+.respuesta-directa span { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #25d366; }
+
+@media (min-width: 700px) {
+  .contacto { padding: 5rem 0; }
+  .rejilla { grid-template-columns: 0.9fr 1.1fr; gap: 2.5rem; }
+  .formulario-panel { padding: 1.75rem; }
+}
+
+@media (min-width: 1000px) {
+  .rejilla { grid-template-columns: 5fr 7fr; gap: 3rem; }
+  .formulario-panel { padding: 2rem; }
+  .datos-taller { padding: 1.4rem; }
+}

@@ -1,0 +1,82 @@
+:host { display: block; min-width: 0; }
+
+.tarjeta {
+  display: flex;
+  height: 100%;
+  min-height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  background: var(--papel);
+  box-shadow: 0 2px 8px rgb(22 33 58 / 5%);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.tarjeta:hover { transform: translateY(-4px); border-color: var(--cinta); box-shadow: 0 12px 26px rgb(22 33 58 / 10%); }
+
+.tarjeta-imagen {
+  position: relative;
+  display: grid;
+  min-height: 180px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  place-items: center;
+  border-bottom: 1px dashed var(--linea);
+  background:
+    radial-gradient(circle at 50% 50%, rgb(251 248 241 / 96%) 0 24%, transparent 24.5%),
+    radial-gradient(#d6caa9 0.6px, transparent 0.6px),
+    #f0ecdf;
+  background-size: auto, 12px 12px, auto;
+}
+
+:host(:nth-child(2)) .tarjeta-imagen {
+  background:
+    radial-gradient(circle at 50% 50%, rgb(251 248 241 / 96%) 0 24%, transparent 24.5%),
+    radial-gradient(#d6caa9 0.6px, transparent 0.6px),
+    #f5e6da;
+  background-size: auto, 12px 12px, auto;
+}
+
+:host(:nth-child(3)) .tarjeta-imagen {
+  background:
+    radial-gradient(circle at 50% 50%, rgb(251 248 241 / 96%) 0 24%, transparent 24.5%),
+    radial-gradient(#d6caa9 0.6px, transparent 0.6px),
+    #f7f0dc;
+  background-size: auto, 12px 12px, auto;
+}
+
+.tarjeta-icono {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid rgb(22 33 58 / 12%);
+  border-radius: 50%;
+  background: var(--lino);
+  color: var(--tinta);
+  font-size: 2.4rem;
+  box-shadow: 0 5px 16px rgb(22 33 58 / 9%);
+  transition: transform 200ms ease;
+}
+
+.tarjeta:hover .tarjeta-icono { transform: rotate(-5deg) scale(1.05); }
+.tarjeta-numero, .tarjeta-etiqueta, .tarjeta-precio { position: absolute; z-index: 1; font-family: var(--fuente-codigo); }
+.tarjeta-numero { top: 0.8rem; left: 0.85rem; color: var(--denim); font-size: 0.65rem; font-weight: 700; }
+.tarjeta-etiqueta { bottom: 0.7rem; left: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 3px; background: rgb(22 33 58 / 88%); color: #fff; font-size: 0.58rem; }
+.tarjeta-precio { top: 0.65rem; right: 0.7rem; max-width: 60%; padding: 0.3rem 0.5rem; border: 1px solid rgb(22 33 58 / 12%); border-radius: 4px; background: var(--cinta); color: var(--tinta); font-size: 0.58rem; font-weight: 700; text-align: center; text-transform: uppercase; }
+
+.tarjeta-contenido { display: flex; flex: 1; flex-direction: column; padding: 1.3rem 1.35rem 1.1rem; background: var(--lino); }
+h3 { margin: 0 0 0.65rem; color: var(--tinta); font: 700 1.18rem/1.35 var(--fuente-titulos); }
+.descripcion { margin: 0 0 1rem; color: var(--denim); font-size: 0.9rem; line-height: 1.65; }
+
+.beneficios { display: grid; gap: 0.5rem; margin: 0 0 1.25rem; padding: 0.85rem 0 0; border-top: 1px dashed var(--linea); list-style: none; }
+.beneficios li { display: flex; align-items: flex-start; gap: 0.55rem; color: var(--denim); font-size: 0.78rem; line-height: 1.45; }
+.beneficios li > span { width: 6px; height: 6px; flex: 0 0 auto; margin-top: 0.38rem; border-radius: 50%; background: var(--hilo); }
+
+.tarjeta-enlace { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; padding: 0.65rem 0.8rem; border: 1px solid var(--linea-oscura); border-radius: 5px; background: var(--tiza); color: var(--tinta); font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: background-color 160ms ease, color 160ms ease; }
+.tarjeta-enlace:hover { border-color: var(--tinta); background: var(--tinta); color: var(--papel); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta, .tarjeta-icono, .tarjeta-enlace { transition: none; }
+}
