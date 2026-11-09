@@ -1,0 +1,49 @@
+<app-header [nombre]="nombreTaller" />
+
+<main>
+  <app-hero [nombre]="nombreTaller" />
+
+  <div class="tape tape-divisor" role="separator" aria-label="Divisor con marcas de cinta métrica"></div>
+
+  <section id="servicios" class="servicios">
+    <div class="container">
+      <div class="encabezado-seccion">
+        <p class="catalogo"><span class="material-symbols-outlined" aria-hidden="true">sell</span>Catálogo artesanal</p>
+        <h2>Nuestros servicios</h2>
+        <p class="intro">Cuidamos cada puntada para conservar la forma, la caída y la durabilidad de tus prendas favoritas.</p>
+      </div>
+
+      <div class="rejilla">
+        @for (s of servicios; track s.titulo; let indice = $index) {
+          <app-service-card
+            [titulo]="s.titulo"
+            [descripcion]="s.descripcion"
+            [precio]="s.precio"
+            [etiqueta]="s.etiqueta"
+            [icono]="s.icono"
+            [beneficios]="s.beneficios"
+            [numero]="indice + 1" />
+        }
+      </div>
+    </div>
+  </section>
+
+  <app-contact
+    [nombreTaller]="nombreTaller"
+    [whatsapp]="whatsapp"
+    [servicios]="titulosServicios" />
+</main>
+
+<footer class="pie">
+  <div class="tape" aria-hidden="true"></div>
+  <div class="container pie-contenido">
+    <a class="pie-marca" href="#inicio">
+      <span class="material-symbols-outlined" aria-hidden="true">straighten</span>
+      <span>{{ nombreTaller }}<small>Costura a tu medida</small></span>
+    </a>
+    <p>© {{ anio }} {{ nombreTaller }}. Todos los derechos reservados.</p>
+    <nav aria-label="Enlaces del pie de página">
+      <a href="#servicios">Servicios</a><span aria-hidden="true">•</span><a href="#contacto">Contacto</a>
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,219 @@
+<div class="adm-auth">
+  <section class="auth-marca" aria-labelledby="lema-registro">
+    <a class="auth-marca__logo" routerLink="/" aria-label="Volver al sitio del taller">
+      <span class="auth-marca__logo-icono" aria-hidden="true">
+        <span class="material-symbols-outlined">straighten</span>
+      </span>
+      <span>
+        <strong>{{ tallerNombre().nombre }}</strong>
+        <small>Costura &amp; sastrería</small>
+      </span>
+    </a>
+
+    <div class="auth-marca__centro">
+      <p class="adm-eyebrow">Registro privado</p>
+      <p class="auth-marca__lema" id="lema-registro">Tu taller,<br><em>en buenas manos.</em></p>
+      <p class="auth-marca__intro">Crea la cuenta que llevará el control del taller. El registro no es público: solo se abre con un código de invitación.</p>
+
+      <ul class="auth-marca__lista">
+        <li>
+          <span class="material-symbols-outlined" aria-hidden="true">verified_user</span>
+          <span>Acceso reservado a administradores autorizados.</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined" aria-hidden="true">key</span>
+          <span>Contraseña propia, con verificación de seguridad.</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+          <span>Catálogo, pedidos y clientes en el mismo panel.</span>
+        </li>
+      </ul>
+    </div>
+
+    <footer class="auth-marca__pie">
+      <span>Registro con invitación</span>
+      <span>Datos del taller</span>
+    </footer>
+  </section>
+
+  <section class="auth-panel" aria-labelledby="titulo-registro">
+    <div class="auth-card auth-card--ancha">
+      <header class="auth-card__cabecera">
+        <p class="adm-eyebrow">Acceso privado</p>
+        <h1 id="titulo-registro">Crear administrador</h1>
+        <p>Completa los datos y valida tu código de invitación.</p>
+      </header>
+
+      @if (error()) {
+        <div class="adm-alerta adm-alerta--error" role="alert">
+          <span class="material-symbols-outlined" aria-hidden="true">error</span>
+          <p>{{ error() }}</p>
+        </div>
+      }
+
+      <form class="adm-form" [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        <div class="adm-field">
+          <label for="registro-nombre">Nombre completo <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <input
+            id="registro-nombre"
+            class="adm-input"
+            type="text"
+            formControlName="nombre"
+            autocomplete="name"
+            placeholder="Ej. Carmen Rodríguez"
+            [attr.aria-invalid]="mensajeNombre() ? 'true' : null"
+            [attr.aria-describedby]="mensajeNombre() ? 'error-registro-nombre' : null" />
+          @if (mensajeNombre(); as mensaje) {
+            <p class="adm-error" id="error-registro-nombre">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="adm-field">
+          <label for="registro-correo">Correo electrónico <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <div class="adm-campo-icono">
+            <span class="material-symbols-outlined" aria-hidden="true">mail</span>
+            <input
+              id="registro-correo"
+              class="adm-input"
+              type="email"
+              formControlName="correo"
+              autocomplete="email"
+              inputmode="email"
+              placeholder="tu@correo.com"
+              (input)="limpiarErrorCorreo()"
+              [attr.aria-invalid]="mensajeCorreo() ? 'true' : null"
+              [attr.aria-describedby]="mensajeCorreo() ? 'error-registro-correo' : null" />
+          </div>
+          @if (mensajeCorreo(); as mensaje) {
+            <p class="adm-error" id="error-registro-correo">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="adm-field">
+          <label for="registro-contrasena">Contraseña <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <div class="adm-campo-boton">
+            <input
+              id="registro-contrasena"
+              class="adm-input"
+              [type]="mostrarContrasena() ? 'text' : 'password'"
+              formControlName="contrasena"
+              autocomplete="new-password"
+              placeholder="Mínimo 8 caracteres"
+              [attr.aria-invalid]="mensajeContrasena() ? 'true' : null"
+              [attr.aria-describedby]="'fuerza-contrasena' + (mensajeContrasena() ? ' error-registro-contrasena' : '')" />
+            <button
+              type="button"
+              [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="mostrarContrasena()"
+              (click)="alternarContrasena()">
+              <span class="material-symbols-outlined" aria-hidden="true">
+                {{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+
+          <div class="adm-fuerza" [class]="'adm-fuerza ' + claseFuerza()" id="fuerza-contrasena" aria-live="polite">
+            <div class="adm-fuerza__barras" aria-hidden="true">
+              <span class="adm-fuerza__barra"></span>
+              <span class="adm-fuerza__barra"></span>
+              <span class="adm-fuerza__barra"></span>
+              <span class="adm-fuerza__barra"></span>
+              <span class="adm-fuerza__barra"></span>
+            </div>
+            <div class="adm-fuerza__texto">
+              <strong>{{ fuerza().etiqueta }}</strong>
+              <span aria-hidden="true">{{ fuerza().puntaje + 1 }}/5</span>
+            </div>
+            <p class="adm-field__ayuda">{{ fuerza().descripcion }}</p>
+          </div>
+
+          @if (mensajeContrasena(); as mensaje) {
+            <p class="adm-error" id="error-registro-contrasena">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="adm-field">
+          <label for="registro-confirmar">Confirmar contraseña <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <div class="adm-campo-boton">
+            <input
+              id="registro-confirmar"
+              class="adm-input"
+              [type]="mostrarConfirmacion() ? 'text' : 'password'"
+              formControlName="confirmar"
+              autocomplete="new-password"
+              placeholder="Repite la contraseña"
+              [attr.aria-invalid]="mensajeConfirmar() ? 'true' : null"
+              [attr.aria-describedby]="mensajeConfirmar() ? 'error-registro-confirmar' : null" />
+            <button
+              type="button"
+              [attr.aria-label]="mostrarConfirmacion() ? 'Ocultar confirmación' : 'Mostrar confirmación'"
+              [attr.aria-pressed]="mostrarConfirmacion()"
+              (click)="alternarConfirmacion()">
+              <span class="material-symbols-outlined" aria-hidden="true">
+                {{ mostrarConfirmacion() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+          @if (mensajeConfirmar(); as mensaje) {
+            <p class="adm-error" id="error-registro-confirmar">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="adm-field">
+          <label for="registro-codigo">Código de invitación <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <div class="adm-campo-icono">
+            <span class="material-symbols-outlined" aria-hidden="true">key</span>
+            <input
+              id="registro-codigo"
+              class="adm-input"
+              type="text"
+              formControlName="codigo"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              placeholder="XXXX-0000"
+              (input)="limpiarErrorCodigo()"
+              [attr.aria-invalid]="mensajeCodigo() ? 'true' : null"
+              [attr.aria-describedby]="'ayuda-registro-codigo' + (mensajeCodigo() ? ' error-registro-codigo' : '')" />
+          </div>
+          <p class="adm-field__ayuda" id="ayuda-registro-codigo">
+            El código se entrega en el taller. No lo compartas con personas ajenas al negocio.
+          </p>
+          @if (mensajeCodigo(); as mensaje) {
+            <p class="adm-error" id="error-registro-codigo">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <button
+          class="adm-btn adm-btn--primario adm-btn--bloque"
+          type="submit"
+          [class.adm-btn--cargando]="cargando()"
+          [disabled]="cargando()">
+          {{ cargando() ? 'Creando cuenta' : 'Crear cuenta' }}
+        </button>
+      </form>
+
+      <div class="auth-card__pie">
+        <p>
+          ¿Ya tienes una cuenta?
+          <a class="adm-enlace" routerLink="/admin/login">Inicia sesión</a>
+        </p>
+      </div>
+
+      <p class="auth-legal">
+        El registro no es público. La cuenta creada tendrá acceso completo al panel de {{ tallerNombre().nombre }}.
+      </p>
+    </div>
+  </section>
+</div>

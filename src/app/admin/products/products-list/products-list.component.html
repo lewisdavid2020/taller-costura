@@ -1,0 +1,232 @@
+<app-page-header
+  eyebrow="Catálogo del taller"
+  titulo="Productos"
+  [descripcion]="productos().length + ' piezas registradas. Administra precios, fotos y visibilidad en el catálogo.'">
+  <a class="adm-btn adm-btn--acento" routerLink="/admin/productos/nuevo">
+    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+    Agregar producto
+  </a>
+</app-page-header>
+
+<div class="productos-toolbar" role="search" aria-label="Filtros de productos">
+  <div class="buscador">
+    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+    <label class="adm-sr-only" for="buscar-productos">Buscar productos</label>
+    <input
+      id="buscar-productos"
+      class="adm-input"
+      type="search"
+      placeholder="Buscar por nombre, categoría o descripción..."
+      [value]="busqueda()"
+      (input)="cambiarBusqueda($event)" />
+  </div>
+
+  <div>
+    <label class="adm-sr-only" for="filtrar-categoria">Filtrar por categoría</label>
+    <select id="filtrar-categoria" class="adm-input" [value]="categoria()" (change)="cambiarCategoria($event)">
+      <option value="todas">Todas las categorías</option>
+      @for (categoria of categorias; track categoria) {
+        <option [value]="categoria">{{ categoria }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="segmento" role="group" aria-label="Filtrar por estado">
+    <button
+      type="button"
+      [class.activo]="estado() === 'todos'"
+      [attr.aria-pressed]="estado() === 'todos'"
+      (click)="cambiarEstado('todos')">Todos</button>
+    <button
+      type="button"
+      [class.activo]="estado() === 'activo'"
+      [attr.aria-pressed]="estado() === 'activo'"
+      (click)="cambiarEstado('activo')">Activos</button>
+    <button
+      type="button"
+      [class.activo]="estado() === 'oculto'"
+      [attr.aria-pressed]="estado() === 'oculto'"
+      (click)="cambiarEstado('oculto')">Ocultos</button>
+  </div>
+</div>
+
+@if (sinProductos()) {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">checkroom</span>
+    </span>
+    <h2>El catálogo está vacío</h2>
+    <p>Agrega la primera pieza para que tus clientes puedan verla y pedir una cotización.</p>
+    <a class="adm-btn adm-btn--acento" routerLink="/admin/productos/nuevo">
+      <span class="material-symbols-outlined" aria-hidden="true">add</span>
+      Agregar primer producto
+    </a>
+  </div>
+} @else if (sinResultados()) {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">search_off</span>
+    </span>
+    <h2>No encontramos productos</h2>
+    <p>Prueba con otra palabra o cambia los filtros de categoría y estado.</p>
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+} @else {
+  <div class="adm-card data-card data-card--tabla">
+    <div class="data-tabla-scroll">
+      <table class="data-tabla">
+        <thead>
+          <tr>
+            <th scope="col">Producto</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Estado</th>
+            <th scope="col" class="data-tabla__acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (producto of visibles(); track producto.id) {
+            <tr>
+              <td>
+                <div class="producto-celda">
+                  <span class="producto-celda__foto">
+                    @if (producto.imagenes.length > 0) {
+                      <img [src]="producto.imagenes[0]" alt="" loading="lazy" />
+                    } @else {
+                      <span class="material-symbols-outlined" aria-hidden="true">{{ icono(producto.categoria) }}</span>
+                    }
+                  </span>
+                  <span>
+                    <span class="producto-celda__nombre">{{ producto.nombre }}</span>
+                    <span class="producto-celda__meta">Agregado {{ formatearFecha(producto.creadoEn) }}</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="data-tabla__categoria">{{ producto.categoria }}</span></td>
+              <td><span class="data-tabla__numero">{{ formatearPrecio(producto.precio) }}</span></td>
+              <td>
+                <span [class]="'adm-pildora adm-pildora--' + producto.estado">
+                  {{ producto.estado === 'activo' ? 'Activo' : 'Oculto' }}
+                </span>
+              </td>
+              <td>
+                <div class="data-tabla__acciones">
+                  <a
+                    class="adm-icon-btn"
+                    [routerLink]="['/admin/productos', producto.id, 'editar']"
+                    [attr.aria-label]="'Editar ' + producto.nombre">
+                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                  </a>
+                  <button
+                    class="adm-icon-btn adm-icon-btn--peligro"
+                    type="button"
+                    [attr.aria-label]="'Eliminar ' + producto.nombre"
+                    (click)="pedirEliminar(producto)">
+                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="productos-pie">
+      <p>{{ resumen() }}</p>
+      <nav class="paginacion" aria-label="Paginación de productos">
+        <button
+          type="button"
+          aria-label="Página anterior"
+          [disabled]="pagina() === 1"
+          (click)="irAPagina(pagina() - 1)">
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+        </button>
+        @for (numero of paginas(); track numero) {
+          <button
+            type="button"
+            [class.activo]="numero === pagina()"
+            [attr.aria-current]="numero === pagina() ? 'page' : null"
+            [attr.aria-label]="'Ir a la página ' + numero"
+            (click)="irAPagina(numero)">{{ numero }}</button>
+        }
+        <button
+          type="button"
+          aria-label="Página siguiente"
+          [disabled]="pagina() === totalPaginas()"
+          (click)="irAPagina(pagina() + 1)">
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <div class="productos-movil" aria-label="Lista de productos">
+    @for (producto of visibles(); track producto.id) {
+      <article class="producto-movil">
+        <span class="producto-movil__foto">
+          @if (producto.imagenes.length > 0) {
+            <img [src]="producto.imagenes[0]" alt="" loading="lazy" />
+          } @else {
+            <span class="material-symbols-outlined" aria-hidden="true">{{ icono(producto.categoria) }}</span>
+          }
+        </span>
+        <div class="producto-movil__cuerpo">
+          <h3>{{ producto.nombre }}</h3>
+          <p class="producto-movil__meta">
+            <span>{{ producto.categoria }}</span>
+            <span [class]="'adm-pildora adm-pildora--' + producto.estado">
+              {{ producto.estado === 'activo' ? 'Activo' : 'Oculto' }}
+            </span>
+          </p>
+          <p class="producto-movil__precio">{{ formatearPrecio(producto.precio) }}</p>
+          <div class="producto-movil__acciones">
+            <a class="adm-btn adm-btn--fantasma adm-btn--sm" [routerLink]="['/admin/productos', producto.id, 'editar']">
+              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+              Editar
+            </a>
+            <button
+              class="adm-icon-btn adm-icon-btn--peligro"
+              type="button"
+              [attr.aria-label]="'Eliminar ' + producto.nombre"
+              (click)="pedirEliminar(producto)">
+              <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+
+    <div class="adm-card productos-pie">
+      <p>{{ resumen() }}</p>
+      <nav class="paginacion" aria-label="Paginación de productos en móvil">
+        <button
+          type="button"
+          aria-label="Página anterior"
+          [disabled]="pagina() === 1"
+          (click)="irAPagina(pagina() - 1)">
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+        </button>
+        <button
+          type="button"
+          [class.activo]="true"
+          [attr.aria-label]="'Página ' + pagina() + ' de ' + totalPaginas()"
+          disabled>{{ pagina() }}</button>
+        <button
+          type="button"
+          aria-label="Página siguiente"
+          [disabled]="pagina() === totalPaginas()"
+          (click)="irAPagina(pagina() + 1)">
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+}
+
+<app-confirm-dialog
+  #confirmar
+  titulo="¿Eliminar este producto?"
+  [mensaje]="'Se eliminará «' + (productoAEliminar()?.nombre ?? 'este producto') + '» del catálogo. Esta acción no se puede deshacer.'"
+  etiquetaConfirmar="Eliminar producto"
+  (confirmado)="eliminar()" />

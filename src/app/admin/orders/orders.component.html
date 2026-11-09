@@ -1,0 +1,136 @@
+<app-page-header
+  eyebrow="Operación del taller"
+  titulo="Pedidos"
+  [descripcion]="pedidos().length + ' pedidos registrados. Sigue el avance de cada trabajo y actualiza su estado.'" />
+
+<div class="filtros-fila" role="group" aria-label="Filtrar pedidos por estado">
+  <button
+    class="adm-btn adm-btn--sm"
+    [class.adm-btn--primario]="filtro() === 'todos'"
+    [class.adm-btn--fantasma]="filtro() !== 'todos'"
+    type="button"
+    [attr.aria-pressed]="filtro() === 'todos'"
+    (click)="filtro.set('todos')">
+    Todos <span class="adm-mono">({{ contar('todos') }})</span>
+  </button>
+  @for (estado of estados; track estado) {
+    <button
+      class="adm-btn adm-btn--sm"
+      [class.adm-btn--primario]="filtro() === estado"
+      [class.adm-btn--fantasma]="filtro() !== estado"
+      type="button"
+      [attr.aria-pressed]="filtro() === estado"
+      (click)="filtro.set(estado)">
+      {{ etiqueta(estado) }} <span class="adm-mono">({{ contar(estado) }})</span>
+    </button>
+  }
+</div>
+
+@if (filtrados().length > 0) {
+  <div class="adm-card data-card data-card--desktop">
+    <div class="data-tabla-scroll">
+      <table class="data-tabla tabla-pedidos">
+        <thead>
+          <tr>
+            <th scope="col">Pedido</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Servicio</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Entrega</th>
+            <th scope="col">Total</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Actualizar estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pedido of filtrados(); track pedido.id) {
+            <tr>
+              <td><span class="data-tabla__numero">{{ pedido.folio }}</span></td>
+              <td>
+                <span class="data-tabla__numero">{{ pedido.cliente }}</span>
+                <span class="data-tabla__sub">{{ pedido.correo }}</span>
+              </td>
+              <td>{{ pedido.servicio }}</td>
+              <td>{{ formatearFecha(pedido.fecha) }}</td>
+              <td>{{ formatearFecha(pedido.entrega) }}</td>
+              <td><span class="data-tabla__numero">{{ formatearPrecio(pedido.total) }}</span></td>
+              <td><app-estado-badge [estado]="pedido.estado" /></td>
+              <td>
+                <label class="adm-sr-only" [for]="'estado-' + pedido.id">Estado del pedido {{ pedido.folio }}</label>
+                <select
+                  class="adm-input selector-estado"
+                  [id]="'estado-' + pedido.id"
+                  [value]="pedido.estado"
+                  (change)="cambiarEstado(pedido, $event)">
+                  @for (estado of estados; track estado) {
+                    <option [value]="estado">{{ etiqueta(estado) }}</option>
+                  }
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="productos-pie">
+      <p>Mostrando {{ formatearNumero(filtrados().length) }} pedidos</p>
+    </div>
+  </div>
+
+  <div class="lista-movil" aria-label="Lista de pedidos">
+    @for (pedido of filtrados(); track pedido.id) {
+      <article class="pedido-movil">
+        <header class="pedido-movil__cabecera">
+          <span class="data-tabla__numero">{{ pedido.folio }}</span>
+          <app-estado-badge [estado]="pedido.estado" />
+        </header>
+
+        <div>
+          <h3 class="pedido-movil__cliente">{{ pedido.cliente }}</h3>
+          <p class="pedido-movil__servicio">{{ pedido.servicio }}</p>
+        </div>
+
+        <dl class="pedido-movil__datos">
+          <div>
+            <dt>Fecha</dt>
+            <dd>{{ formatearFecha(pedido.fecha) }}</dd>
+          </div>
+          <div>
+            <dt>Entrega</dt>
+            <dd>{{ formatearFecha(pedido.entrega) }}</dd>
+          </div>
+          <div>
+            <dt>Total</dt>
+            <dd class="data-tabla__numero">{{ formatearPrecio(pedido.total) }}</dd>
+          </div>
+          <div>
+            <dt>Correo</dt>
+            <dd>{{ pedido.correo }}</dd>
+          </div>
+        </dl>
+
+        <label class="pedido-movil__estado">
+          <span>Actualizar estado</span>
+          <select
+            class="adm-input selector-estado"
+            [value]="pedido.estado"
+            (change)="cambiarEstado(pedido, $event)">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ etiqueta(estado) }}</option>
+            }
+          </select>
+        </label>
+      </article>
+    }
+    <p class="lista-movil__nota">Mostrando {{ formatearNumero(filtrados().length) }} pedidos</p>
+  </div>
+} @else {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">receipt_long</span>
+    </span>
+    <h2>No hay pedidos en este estado</h2>
+    <p>Cambia el filtro para revisar el resto de la operación del taller.</p>
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="filtro.set('todos')">Ver todos los pedidos</button>
+  </div>
+}

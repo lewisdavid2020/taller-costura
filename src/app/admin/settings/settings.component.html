@@ -1,0 +1,164 @@
+<app-page-header
+  eyebrow="Ajustes del negocio"
+  titulo="Configuración"
+  descripcion="Actualiza los datos que identifican al taller y la forma en que los clientes se comunican contigo." />
+
+@if (errorFormulario()) {
+  <div class="adm-alerta adm-alerta--error" role="alert">
+    <span class="material-symbols-outlined" aria-hidden="true">error</span>
+    <p>{{ errorFormulario() }}</p>
+  </div>
+}
+
+<div class="settings-grid">
+  <form class="adm-card form-panel" [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+    <header class="form-panel__cabecera">
+      <h2>Datos del taller</h2>
+      <p>Esta información aparece en el panel y en el sitio público.</p>
+    </header>
+
+    <div class="form-panel__cuerpo">
+      <div class="adm-field">
+        <label for="ajuste-nombre">Nombre del taller <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+        <input
+          id="ajuste-nombre"
+          class="adm-input"
+          type="text"
+          formControlName="nombre"
+          autocomplete="organization"
+          [attr.aria-invalid]="mensajeNombre() ? 'true' : null"
+          [attr.aria-describedby]="mensajeNombre() ? 'error-ajuste-nombre' : null" />
+        @if (mensajeNombre(); as mensaje) {
+          <p class="adm-error" id="error-ajuste-nombre">
+            <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+          </p>
+        }
+      </div>
+
+      <div class="form-grid-2">
+        <div class="adm-field">
+          <label for="ajuste-whatsapp">WhatsApp <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <input
+            id="ajuste-whatsapp"
+            class="adm-input"
+            type="tel"
+            formControlName="whatsapp"
+            autocomplete="tel"
+            inputmode="tel"
+            [attr.aria-invalid]="mensajeWhatsapp() ? 'true' : null"
+            [attr.aria-describedby]="mensajeWhatsapp() ? 'error-ajuste-whatsapp' : null" />
+          @if (mensajeWhatsapp(); as mensaje) {
+            <p class="adm-error" id="error-ajuste-whatsapp">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="adm-field">
+          <label for="ajuste-correo">Correo de contacto <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <input
+            id="ajuste-correo"
+            class="adm-input"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            [attr.aria-invalid]="mensajeCorreo() ? 'true' : null"
+            [attr.aria-describedby]="mensajeCorreo() ? 'error-ajuste-correo' : null" />
+          @if (mensajeCorreo(); as mensaje) {
+            <p class="adm-error" id="error-ajuste-correo">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="adm-field">
+        <label for="ajuste-direccion">Dirección <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+        <input
+          id="ajuste-direccion"
+          class="adm-input"
+          type="text"
+          formControlName="direccion"
+          autocomplete="street-address"
+          [attr.aria-invalid]="mensajeDireccion() ? 'true' : null"
+          [attr.aria-describedby]="mensajeDireccion() ? 'error-ajuste-direccion' : null" />
+        @if (mensajeDireccion(); as mensaje) {
+          <p class="adm-error" id="error-ajuste-direccion">
+            <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+          </p>
+        }
+      </div>
+
+      <div class="adm-field">
+        <label for="ajuste-horario">Horario de atención <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+        <input
+          id="ajuste-horario"
+          class="adm-input"
+          type="text"
+          formControlName="horario"
+          placeholder="Ej. Lunes a sábado, 9:00 a 18:00"
+          [attr.aria-invalid]="mensajeHorario() ? 'true' : null"
+          [attr.aria-describedby]="mensajeHorario() ? 'error-ajuste-horario' : null" />
+        @if (mensajeHorario(); as mensaje) {
+          <p class="adm-error" id="error-ajuste-horario">
+            <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <footer class="form-panel__pie">
+      <button class="adm-btn adm-btn--primario" type="submit">
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
+        Guardar cambios
+      </button>
+    </footer>
+  </form>
+
+  <aside class="adm-form" aria-label="Información de la cuenta">
+    <section class="adm-card form-panel">
+      <header class="form-panel__cabecera">
+        <h2>Cuenta administradora</h2>
+        <p>Persona con acceso completo a este panel.</p>
+      </header>
+      <div class="form-panel__cuerpo">
+        @if (sesion(); as admin) {
+          <div class="cliente-celda">
+            <span class="cliente-celda__avatar" aria-hidden="true">{{ iniciales(admin.nombre) }}</span>
+            <span>
+              <span class="producto-celda__nombre">{{ admin.nombre }}</span>
+              <span class="data-tabla__sub">{{ admin.correo }}</span>
+            </span>
+          </div>
+        }
+
+        <div class="ajuste-fila">
+          <div>
+            <strong>Registro de administradores</strong>
+            <small>El alta de nuevas cuentas exige un código de invitación vigente.</small>
+          </div>
+          <span class="adm-pildora adm-pildora--activo">Protegido</span>
+        </div>
+
+        <div class="ajuste-fila">
+          <div>
+            <strong>Sesión local</strong>
+            <small>Los datos del panel se guardan en este navegador. Para usarlo en otro equipo, crea la cuenta allí.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="adm-card form-panel">
+      <header class="form-panel__cabecera">
+        <h2>Consejo del taller</h2>
+      </header>
+      <div class="form-panel__cuerpo">
+        <p class="adm-field__ayuda">
+          Mantén el nombre y el WhatsApp actualizados: son los datos que verán tus clientes cuando quieran cotizar un
+          arreglo o una confección.
+        </p>
+      </div>
+    </section>
+  </aside>
+</div>

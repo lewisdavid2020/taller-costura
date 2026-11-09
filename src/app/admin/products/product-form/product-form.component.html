@@ -1,0 +1,229 @@
+<app-page-header
+  [eyebrow]="esEdicion ? 'Catálogo · Edición' : 'Catálogo · Nueva pieza'"
+  [titulo]="titulo()"
+  [descripcion]="descripcionPagina()">
+  <a class="adm-btn adm-btn--fantasma" routerLink="/admin/productos">
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+    Volver al catálogo
+  </a>
+</app-page-header>
+
+@if (noEncontrado()) {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">search_off</span>
+    </span>
+    <h2>Producto no encontrado</h2>
+    <p>La pieza que intentas editar no existe o fue eliminada del catálogo.</p>
+    <a class="adm-btn adm-btn--primario" routerLink="/admin/productos">Volver a productos</a>
+  </div>
+} @else {
+  @if (errorFormulario()) {
+    <div class="adm-alerta adm-alerta--error" role="alert">
+      <span class="material-symbols-outlined" aria-hidden="true">error</span>
+      <p>{{ errorFormulario() }}</p>
+    </div>
+  }
+
+  <form class="adm-form" [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+    <div class="form-layout">
+      <section class="adm-card form-panel" aria-labelledby="titulo-info-producto">
+        <header class="form-panel__cabecera">
+          <h2 id="titulo-info-producto">Información del producto</h2>
+          <p>Nombre, categoría, precio y descripción para el catálogo.</p>
+        </header>
+
+        <div class="form-panel__cuerpo">
+          <div class="adm-field">
+            <label for="producto-nombre">Nombre del producto <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+            <input
+              id="producto-nombre"
+              class="adm-input"
+              type="text"
+              formControlName="nombre"
+              maxlength="80"
+              placeholder="Ej. Vestido de lino a medida"
+              [attr.aria-invalid]="mensajeNombre() ? 'true' : null"
+              [attr.aria-describedby]="mensajeNombre() ? 'error-producto-nombre' : null" />
+            @if (mensajeNombre(); as mensaje) {
+              <p class="adm-error" id="error-producto-nombre">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+              </p>
+            }
+          </div>
+
+          <div class="adm-field">
+            <label for="producto-descripcion">Descripción <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+            <textarea
+              id="producto-descripcion"
+              class="adm-input"
+              formControlName="descripcion"
+              rows="5"
+              maxlength="600"
+              placeholder="Describe la prenda, los materiales, las opciones de personalización y los acabados..."
+              [attr.aria-invalid]="mensajeDescripcion() ? 'true' : null"
+              [attr.aria-describedby]="
+                'ayuda-producto-descripcion' + (mensajeDescripcion() ? ' error-producto-descripcion' : '')
+              "></textarea>
+            <p class="adm-field__ayuda" id="ayuda-producto-descripcion">
+              {{ descripcion.value.length }} de 600 caracteres. Una buena descripción ayuda a cotizar mejor.
+            </p>
+            @if (mensajeDescripcion(); as mensaje) {
+              <p class="adm-error" id="error-producto-descripcion">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+              </p>
+            }
+          </div>
+
+          <div class="form-grid-2">
+            <div class="adm-field">
+              <label for="producto-categoria">Categoría <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+              <select
+                id="producto-categoria"
+                class="adm-input"
+                formControlName="categoria"
+                [attr.aria-invalid]="mensajeCategoria() ? 'true' : null"
+                [attr.aria-describedby]="mensajeCategoria() ? 'error-producto-categoria' : null">
+                <option value="" disabled>Selecciona una categoría</option>
+                @for (categoria of categorias; track categoria) {
+                  <option [value]="categoria">{{ categoria }}</option>
+                }
+              </select>
+              @if (mensajeCategoria(); as mensaje) {
+                <p class="adm-error" id="error-producto-categoria">
+                  <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+                </p>
+              }
+            </div>
+
+            <div class="adm-field">
+              <label for="producto-precio">Precio <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+              <div class="precio-campo">
+                <span aria-hidden="true">$</span>
+                <input
+                  id="producto-precio"
+                  class="adm-input"
+                  type="number"
+                  formControlName="precio"
+                  min="0.01"
+                  step="0.01"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  [attr.aria-invalid]="mensajePrecio() ? 'true' : null"
+                  [attr.aria-describedby]="mensajePrecio() ? 'error-producto-precio' : null" />
+              </div>
+              @if (mensajePrecio(); as mensaje) {
+                <p class="adm-error" id="error-producto-precio">
+                  <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="adm-form" aria-label="Fotos y visibilidad">
+        <section class="adm-card form-panel" aria-labelledby="titulo-fotos-producto">
+          <header class="form-panel__cabecera">
+            <h2 id="titulo-fotos-producto">Fotos del producto</h2>
+            <p>Hasta 5 imágenes. La primera será la portada del catálogo.</p>
+          </header>
+
+          <div class="form-panel__cuerpo">
+            <input
+              #archivoInput
+              hidden
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="alSeleccionarFotos($event)" />
+
+            <div
+              class="subida"
+              [class.subida--activa]="arrastrando()"
+              (dragover)="alArrastrar($event)"
+              (dragleave)="alSalirArrastre($event)"
+              (drop)="alSoltar($event)">
+              <span class="subida__icono" aria-hidden="true">
+                <span class="material-symbols-outlined">{{ procesandoFotos() ? 'hourglass_top' : 'add_photo_alternate' }}</span>
+              </span>
+              <strong>{{ procesandoFotos() ? 'Procesando fotos...' : 'Arrastra tus fotos aquí' }}</strong>
+              <p>JPG, PNG, WEBP o SVG · máximo 8 MB por archivo</p>
+              <button
+                class="adm-btn adm-btn--fantasma adm-btn--sm"
+                type="button"
+                [disabled]="procesandoFotos() || imagenes().length >= 5"
+                (click)="abrirSelectorFotos()">
+                Seleccionar archivos
+              </button>
+            </div>
+
+            @if (imagenes().length > 0) {
+              <div class="fotos-grid">
+                @for (foto of imagenes(); track $index) {
+                  <figure class="foto-preview">
+                    <img [src]="foto" [alt]="'Vista previa de la foto ' + ($index + 1) + ' del producto'" />
+                    @if ($index === 0) {
+                      <span class="foto-preview__principal">Principal</span>
+                    }
+                    <button type="button" [attr.aria-label]="'Quitar foto ' + ($index + 1)" (click)="quitarFoto($index)">
+                      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                    </button>
+                  </figure>
+                }
+              </div>
+              <p class="adm-field__ayuda">{{ imagenes().length }} de 5 fotos agregadas.</p>
+            } @else {
+              <p class="adm-field__ayuda">Aún no hay fotos. Puedes guardar el producto y agregarlas después.</p>
+            }
+          </div>
+        </section>
+
+        <section class="adm-card form-panel" aria-labelledby="titulo-visibilidad-producto">
+          <header class="form-panel__cabecera">
+            <h2 id="titulo-visibilidad-producto">Visibilidad</h2>
+            <p>Decide si la pieza aparece en el catálogo público.</p>
+          </header>
+          <div class="form-panel__cuerpo">
+            <label class="adm-switch" for="producto-activo">
+              <input id="producto-activo" type="checkbox" [checked]="esActivo" (change)="cambiarVisibilidad($event)" />
+              <span class="adm-switch__pista" aria-hidden="true"></span>
+              <span class="adm-switch__texto">
+                <strong>{{ esActivo ? 'Visible en el catálogo' : 'Oculto en el catálogo' }}</strong>
+                <small>
+                  {{ esActivo ? 'Los clientes pueden verlo y solicitar cotización.' : 'Solo el equipo del taller puede verlo.' }}
+                </small>
+              </span>
+            </label>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="form-acciones">
+      <a class="adm-btn adm-btn--fantasma" routerLink="/admin/productos">Cancelar</a>
+      <button class="adm-btn adm-btn--primario" type="submit" [disabled]="procesandoFotos()">
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
+        {{ procesandoFotos() ? 'Procesando fotos' : esEdicion ? 'Guardar cambios' : 'Guardar producto' }}
+      </button>
+    </div>
+  </form>
+
+  @if (esEdicion) {
+    <section class="eliminar-zona" aria-labelledby="titulo-eliminar-producto">
+      <h2 id="titulo-eliminar-producto">Eliminar producto</h2>
+      <p>Si esta pieza ya no se ofrece, puedes retirarla del catálogo. Esta acción no se puede deshacer.</p>
+      <button class="adm-btn adm-btn--peligro adm-btn--sm" type="button" (click)="pedirEliminar()">
+        <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+        Eliminar producto
+      </button>
+    </section>
+  }
+
+  <app-confirm-dialog
+    #confirmar
+    titulo="¿Eliminar este producto?"
+    [mensaje]="'Se eliminará «' + (original?.nombre ?? 'este producto') + '» del catálogo. Esta acción no se puede deshacer.'"
+    etiquetaConfirmar="Eliminar producto"
+    (confirmado)="eliminar()" />
+}

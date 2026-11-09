@@ -1,0 +1,238 @@
+<div class="dash-bienvenida">
+  <div>
+    <p class="adm-eyebrow">Resumen del taller</p>
+    <h1>{{ saludo }}, <em>{{ nombrePila() }}</em>.</h1>
+    <p class="dash-bienvenida__fecha">{{ fechaHoy }}</p>
+  </div>
+  <div class="dash-bienvenida__acciones">
+    <a class="adm-btn adm-btn--fantasma" routerLink="/admin/pedidos">
+      <span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>
+      Ver pedidos
+    </a>
+    <a class="adm-btn adm-btn--acento" routerLink="/admin/productos/nuevo">
+      <span class="material-symbols-outlined" aria-hidden="true">add</span>
+      Agregar producto
+    </a>
+  </div>
+</div>
+
+<section class="stats-grid" aria-label="Indicadores del taller">
+  <article class="stat-card stat-card--destacada">
+    <div class="stat-card__cabecera">
+      <p class="stat-card__etiqueta">Total de productos</p>
+      <span class="stat-card__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">checkroom</span>
+      </span>
+    </div>
+    <p class="stat-card__valor">{{ formatearNumero(productosTotal()) }}</p>
+    <p class="stat-card__nota">
+      <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+      {{ productosActivos() }} activos · {{ productosOcultos() }} ocultos
+    </p>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-card__cabecera">
+      <p class="stat-card__etiqueta">Pedidos del mes</p>
+      <span class="stat-card__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">receipt_long</span>
+      </span>
+    </div>
+    <p class="stat-card__valor">{{ formatearNumero(pedidosDelMes()) }}</p>
+    <p class="stat-card__nota">
+      <span class="material-symbols-outlined" aria-hidden="true">autorenew</span>
+      {{ enProceso() }} en proceso ahora
+    </p>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-card__cabecera">
+      <p class="stat-card__etiqueta">Cotizaciones pendientes</p>
+      <span class="stat-card__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">request_quote</span>
+      </span>
+    </div>
+    <p class="stat-card__valor">{{ formatearNumero(cotizacionesPendientes()) }}</p>
+    <p class="stat-card__nota">
+      <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+      Requieren respuesta del taller
+    </p>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-card__cabecera">
+      <p class="stat-card__etiqueta">Ingresos del mes</p>
+      <span class="stat-card__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">payments</span>
+      </span>
+    </div>
+    <p class="stat-card__valor">{{ formatearPrecio(ingresosDelMes()) }}</p>
+    <p class="stat-card__nota">
+      @if (variacion() !== null) {
+        <span class="material-symbols-outlined" aria-hidden="true">
+          {{ variacionPositiva() ? 'trending_up' : 'trending_down' }}
+        </span>
+        <strong [class.negativo]="!variacionPositiva()">{{ variacionTexto() }}</strong>
+        frente al mes anterior
+      } @else {
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        Sin comparación del mes anterior
+      }
+    </p>
+  </article>
+</section>
+
+<div class="dash-grid">
+  <section class="adm-card" aria-labelledby="titulo-ventas">
+    <header class="adm-card__cabecera">
+      <div>
+        <h2 id="titulo-ventas">Ventas de los últimos 6 meses</h2>
+        <p>Solo pedidos entregados y cobrados.</p>
+      </div>
+      <button class="adm-btn adm-btn--texto adm-btn--sm" type="button" disabled>
+        <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>
+        Últimos 6 meses
+      </button>
+    </header>
+
+    <div class="chart-resumen">
+      <strong>{{ formatearPrecio(totalSemestre()) }}</strong>
+      <span>facturado en el periodo</span>
+    </div>
+
+    <figure class="chart-figura">
+      <svg
+        class="chart-ventas"
+        viewBox="0 0 720 214"
+        role="img"
+        [attr.aria-label]="'Gráfico de ventas de los últimos seis meses. ' + resumenVentas()">
+        <defs>
+          <linearGradient id="gradVentas" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#27406b" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#27406b" stop-opacity="0.02" />
+          </linearGradient>
+        </defs>
+
+        @for (y of guiasVentas; track y) {
+          <line x1="20" [attr.y1]="y" x2="700" [attr.y2]="y" stroke="#e4e9f0" stroke-width="1" stroke-dasharray="4 6" />
+        }
+
+        <path [attr.d]="areaVentas()" fill="url(#gradVentas)" />
+        <path
+          [attr.d]="lineaVentas()"
+          fill="none"
+          stroke="#27406b"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round" />
+
+        @for (punto of puntosVentas(); track punto.etiqueta) {
+          <circle [attr.cx]="punto.x" [attr.cy]="punto.y" r="5" fill="#f0c64a" stroke="#16213a" stroke-width="2">
+            <title>{{ punto.etiqueta }}: {{ formatearPrecio(punto.total) }}</title>
+          </circle>
+        }
+      </svg>
+
+      <div class="chart-meses" aria-hidden="true">
+        @for (mes of ventas(); track mes.etiqueta) {
+          <span>{{ mes.etiqueta }}</span>
+        }
+      </div>
+
+      <figcaption class="adm-sr-only">
+        Ventas entregadas por mes:
+        @for (mes of ventas(); track mes.etiqueta) {
+          {{ mes.etiqueta }} {{ formatearPrecio(mes.total) }};
+        }
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="adm-card" aria-labelledby="titulo-servicios">
+    <header class="adm-card__cabecera">
+      <div>
+        <h2 id="titulo-servicios">Servicios más pedidos</h2>
+        <p>Participación sobre el total de pedidos.</p>
+      </div>
+      <span class="material-symbols-outlined" aria-hidden="true">content_cut</span>
+    </header>
+
+    <ul class="servicios-lista">
+      @for (servicio of servicios(); track servicio.servicio) {
+        <li class="servicio-fila">
+          <div class="servicio-fila__cabecera">
+            <span class="servicio-fila__nombre">{{ servicio.servicio }}</span>
+            <span class="servicio-fila__datos">{{ servicio.pedidos }} pedidos · {{ servicio.porcentaje }}%</span>
+          </div>
+          <div
+            class="servicio-fila__pista"
+            role="progressbar"
+            [attr.aria-label]="servicio.servicio"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="servicio.porcentaje">
+            <span class="servicio-fila__barra" [style.width.%]="servicio.porcentaje"></span>
+          </div>
+        </li>
+      } @empty {
+        <li class="empty-state">
+          <span class="empty-state__icono" aria-hidden="true">
+            <span class="material-symbols-outlined">query_stats</span>
+          </span>
+          <p>Todavía no hay pedidos suficientes para calcular la participación.</p>
+        </li>
+      }
+    </ul>
+  </section>
+</div>
+
+<section class="adm-card pedidos-recientes" aria-labelledby="titulo-recientes">
+  <header class="adm-card__cabecera pedidos-recientes__cabecera">
+    <div>
+      <h2 id="titulo-recientes">Pedidos recientes</h2>
+      <p>Los últimos movimientos registrados en el taller.</p>
+    </div>
+    <a class="adm-btn adm-btn--texto adm-btn--sm" routerLink="/admin/pedidos">
+      Ver todos
+      <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+    </a>
+  </header>
+
+  @if (recientes().length > 0) {
+    <table class="pedidos-recientes__tabla">
+      <thead>
+        <tr>
+          <th scope="col">Pedido</th>
+          <th scope="col">Cliente</th>
+          <th scope="col">Servicio</th>
+          <th scope="col">Fecha</th>
+          <th scope="col" class="pedidos-recientes__total">Total</th>
+          <th scope="col" class="pedidos-recientes__estado">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pedido of recientes(); track pedido.id) {
+          <tr>
+            <td data-label="Pedido"><span class="pedidos-recientes__folio">{{ pedido.folio }}</span></td>
+            <td data-label="Cliente"><span class="pedidos-recientes__cliente">{{ pedido.cliente }}</span></td>
+            <td data-label="Servicio">{{ pedido.servicio }}</td>
+            <td data-label="Fecha">{{ formatearFecha(pedido.fecha) }}</td>
+            <td data-label="Total" class="pedidos-recientes__total">{{ formatearPrecio(pedido.total) }}</td>
+            <td data-label="Estado" class="pedidos-recientes__estado">
+              <app-estado-badge [estado]="pedido.estado" />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-state__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">receipt_long</span>
+      </span>
+      <h3>Aún no hay pedidos</h3>
+      <p>Cuando registres el primer pedido, aparecerá aquí con su estado y total.</p>
+      <a class="adm-btn adm-btn--primario" routerLink="/admin/pedidos">Revisar pedidos</a>
+    </div>
+  }
+</section>

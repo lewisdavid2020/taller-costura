@@ -1,0 +1,86 @@
+<app-page-header
+  eyebrow="Relación con clientes"
+  titulo="Clientes"
+  [descripcion]="clientes().length + ' clientes con pedidos en el taller. Consulta su historial y valor de compra.'" />
+
+@if (clientes().length > 0) {
+  <div class="adm-card data-card data-card--desktop">
+    <div class="data-tabla-scroll">
+      <table class="data-tabla tabla-pedidos">
+        <thead>
+          <tr>
+            <th scope="col">Cliente</th>
+            <th scope="col">Contacto</th>
+            <th scope="col">Pedidos</th>
+            <th scope="col">Total entregado</th>
+            <th scope="col">Último pedido</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cliente of clientes(); track cliente.correo) {
+            <tr>
+              <td>
+                <div class="cliente-celda">
+                  <span class="cliente-celda__avatar" aria-hidden="true">{{ iniciales(cliente.nombre) }}</span>
+                  <span>
+                    <span class="producto-celda__nombre">{{ cliente.nombre }}</span>
+                    <span class="data-tabla__sub">{{ cliente.correo }}</span>
+                  </span>
+                </div>
+              </td>
+              <td><span class="adm-mono">{{ cliente.telefono }}</span></td>
+              <td><span class="data-tabla__numero">{{ cliente.pedidos }}</span></td>
+              <td><span class="data-tabla__numero">{{ formatearPrecio(cliente.totalGastado) }}</span></td>
+              <td>{{ formatearFecha(cliente.ultimoPedido) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="productos-pie">
+      <p>El total entregado considera únicamente pedidos con estado «Entregado».</p>
+    </div>
+  </div>
+
+  <div class="lista-movil" aria-label="Lista de clientes">
+    @for (cliente of clientes(); track cliente.correo) {
+      <article class="cliente-movil">
+        <header class="cliente-movil__cabecera">
+          <span class="cliente-celda__avatar" aria-hidden="true">{{ iniciales(cliente.nombre) }}</span>
+          <span>
+            <strong>{{ cliente.nombre }}</strong>
+            <small>{{ cliente.correo }}</small>
+          </span>
+        </header>
+
+        <dl class="cliente-movil__datos">
+          <div>
+            <dt>Teléfono</dt>
+            <dd class="adm-mono">{{ cliente.telefono }}</dd>
+          </div>
+          <div>
+            <dt>Pedidos</dt>
+            <dd>{{ cliente.pedidos }}</dd>
+          </div>
+          <div>
+            <dt>Total entregado</dt>
+            <dd class="data-tabla__numero">{{ formatearPrecio(cliente.totalGastado) }}</dd>
+          </div>
+          <div>
+            <dt>Último pedido</dt>
+            <dd>{{ formatearFecha(cliente.ultimoPedido) }}</dd>
+          </div>
+        </dl>
+      </article>
+    }
+    <p class="lista-movil__nota">El total entregado considera únicamente pedidos con estado «Entregado».</p>
+  </div>
+} @else {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">group</span>
+    </span>
+    <h2>Aún no hay clientes</h2>
+    <p>Los clientes aparecerán aquí en cuanto registres su primer pedido.</p>
+  </div>
+}

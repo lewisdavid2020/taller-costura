@@ -1,0 +1,142 @@
+<div class="adm-auth">
+  <section class="auth-marca" aria-labelledby="lema-acceso">
+    <a class="auth-marca__logo" routerLink="/" aria-label="Volver al sitio del taller">
+      <span class="auth-marca__logo-icono" aria-hidden="true">
+        <span class="material-symbols-outlined">straighten</span>
+      </span>
+      <span>
+        <strong>{{ tallerNombre().nombre }}</strong>
+        <small>Costura &amp; sastrería</small>
+      </span>
+    </a>
+
+    <div class="auth-marca__centro">
+      <p class="adm-eyebrow">Acceso al taller</p>
+      <p class="auth-marca__lema" id="lema-acceso">El taller,<br><em>bajo control.</em></p>
+      <p class="auth-marca__intro">Pedidos, productos y clientes en un solo lugar. La misma precisión de siempre, ahora también en tu operación diaria.</p>
+
+      <ul class="auth-marca__lista">
+        <li>
+          <span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>
+          <span>Pedidos y cotizaciones siempre al día.</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined" aria-hidden="true">checkroom</span>
+          <span>Catálogo del taller actualizado en minutos.</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+          <span>Acceso privado para el equipo autorizado.</span>
+        </li>
+      </ul>
+    </div>
+
+    <footer class="auth-marca__pie">
+      <span>Hecho a la medida</span>
+      <span>Acceso privado</span>
+    </footer>
+  </section>
+
+  <section class="auth-panel" aria-labelledby="titulo-login">
+    <div class="auth-card">
+      <header class="auth-card__cabecera">
+        <p class="adm-eyebrow">Panel administrativo</p>
+        <h1 id="titulo-login">Iniciar sesión</h1>
+        <p>Ingresa con la cuenta de administrador del taller.</p>
+      </header>
+
+      @if (error()) {
+        <div class="adm-alerta adm-alerta--error" role="alert">
+          <span class="material-symbols-outlined" aria-hidden="true">error</span>
+          <p>{{ error() }}</p>
+        </div>
+      }
+
+      @if (aviso()) {
+        <div class="adm-alerta adm-alerta--info" role="status">
+          <span class="material-symbols-outlined" aria-hidden="true">info</span>
+          <p>{{ aviso() }}</p>
+        </div>
+      }
+
+      <form class="adm-form" [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        <div class="adm-field">
+          <label for="login-correo">Correo electrónico <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <div class="adm-campo-icono">
+            <span class="material-symbols-outlined" aria-hidden="true">mail</span>
+            <input
+              id="login-correo"
+              class="adm-input"
+              type="email"
+              formControlName="correo"
+              autocomplete="email"
+              inputmode="email"
+              placeholder="tu@correo.com"
+              [attr.aria-invalid]="mensajeCorreo() ? 'true' : null"
+              [attr.aria-describedby]="mensajeCorreo() ? 'error-login-correo' : null" />
+          </div>
+          @if (mensajeCorreo(); as mensaje) {
+            <p class="adm-error" id="error-login-correo">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="adm-field">
+          <label for="login-contrasena">Contraseña <span class="adm-obligatorio" aria-hidden="true">*</span></label>
+          <div class="adm-campo-boton">
+            <input
+              id="login-contrasena"
+              class="adm-input"
+              [type]="mostrarContrasena() ? 'text' : 'password'"
+              formControlName="contrasena"
+              autocomplete="current-password"
+              placeholder="Tu contraseña"
+              [attr.aria-invalid]="mensajeContrasena() ? 'true' : null"
+              [attr.aria-describedby]="mensajeContrasena() ? 'error-login-contrasena' : null" />
+            <button
+              type="button"
+              [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="mostrarContrasena()"
+              (click)="alternarContrasena()">
+              <span class="material-symbols-outlined" aria-hidden="true">
+                {{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+          @if (mensajeContrasena(); as mensaje) {
+            <p class="adm-error" id="error-login-contrasena">
+              <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <div class="auth-fila">
+          <span class="adm-field__ayuda">Acceso exclusivo del equipo.</span>
+          <button class="adm-btn adm-btn--texto" type="button" (click)="recuperarContrasena()">
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+        <button
+          class="adm-btn adm-btn--primario adm-btn--bloque"
+          type="submit"
+          [class.adm-btn--cargando]="cargando()"
+          [disabled]="cargando()">
+          {{ cargando() ? 'Entrando' : 'Entrar' }}
+        </button>
+      </form>
+
+      <div class="auth-card__pie">
+        <p>
+          ¿Primera vez? La cuenta se crea con un código de invitación.
+          <a class="adm-enlace" routerLink="/admin/registro">Registrar administrador</a>
+        </p>
+      </div>
+
+      <p class="auth-legal">
+        Acceso privado de {{ tallerNombre().nombre }}. Si no deberías estar aquí, cierra esta página.
+      </p>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="titulo">
+  <title id="titulo">Blazer de uniforme</title>
+  <rect width="400" height="400" fill="#f4f6f8"/>
+  <g stroke="#dde3eb" stroke-width="1">
+    <path d="M0 80h400M0 160h400M0 240h400M0 320h400M80 0v400M160 0v400M240 0v400M320 0v400"/>
+  </g>
+  <path d="M156 76 106 104 82 192l42 16 16-44 4 172h112l4-172 16 44 42-16-24-88-50-28-24 34-24-34Z" fill="#ffffff" stroke="#16213a" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="none" stroke="#16213a" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M176 68l24 34-30 76 30-12 24 26-24-52 24 52 30 12-30-76 24-34-22 4-26 30-26-30Z" fill="#f4f6f8"/>
+    <path d="M200 102v26"/>
+    <path d="M150 178h32v38h-32z"/>
+    <path d="M160 300h80" stroke-dasharray="4 6"/>
+  </g>
+  <g fill="#f0c64a" stroke="#16213a" stroke-width="2">
+    <circle cx="200" cy="198" r="5"/>
+    <circle cx="200" cy="236" r="5"/>
+  </g>
+  <g fill="none" stroke="#c4352b" stroke-width="2" stroke-linecap="round">
+    <path d="M158 196h18v22h-18z" fill="#c4352b" opacity="0.12"/>
+    <path d="M162 202h10M162 208h10M162 214h6"/>
+  </g>
+</svg>

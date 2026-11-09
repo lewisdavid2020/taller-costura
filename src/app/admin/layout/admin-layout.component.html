@@ -1,0 +1,102 @@
+<a class="adm-skip" href="#contenido-admin">Saltar al contenido</a>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a class="admin-marca" routerLink="/admin/resumen" aria-label="Ir al resumen del panel">
+      <span class="admin-marca__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">straighten</span>
+      </span>
+      <span>
+        <strong>{{ tallerNombre().nombre }}</strong>
+        <small>Panel del taller</small>
+      </span>
+    </a>
+
+    <nav class="admin-nav" aria-label="Navegación principal">
+      <p class="admin-nav__titulo">Gestión del taller</p>
+      @for (enlace of enlaces; track enlace.ruta) {
+        <a
+          class="admin-nav__enlace"
+          [routerLink]="enlace.ruta"
+          routerLinkActive="activo"
+          [routerLinkActiveOptions]="{ exact: enlace.exacto ?? false }">
+          <span class="material-symbols-outlined" aria-hidden="true">{{ enlace.icono }}</span>
+          {{ enlace.etiqueta }}
+        </a>
+      }
+    </nav>
+
+    <div class="admin-sidebar__cta">
+      <a class="adm-btn adm-btn--acento adm-btn--bloque" routerLink="/admin/productos/nuevo">
+        <span class="material-symbols-outlined" aria-hidden="true">add</span>
+        Nuevo producto
+      </a>
+    </div>
+
+    <div class="admin-sidebar__pie">
+      <div class="admin-sidebar__linea" aria-hidden="true"></div>
+
+      <a class="admin-principal" routerLink="/">
+        <span class="material-symbols-outlined" aria-hidden="true">storefront</span>
+        <span>Principal</span>
+        <span class="material-symbols-outlined admin-principal__flecha" aria-hidden="true">arrow_outward</span>
+      </a>
+
+      @if (sesion(); as admin) {
+        <div class="admin-usuario">
+          <span class="admin-usuario__iniciales" aria-hidden="true">{{ iniciales(admin.nombre) }}</span>
+          <span class="admin-usuario__datos">
+            <strong>{{ admin.nombre }}</strong>
+            <small>{{ admin.correo }}</small>
+          </span>
+        </div>
+      }
+
+      <button class="admin-salir" type="button" (click)="cerrarSesion()">
+        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+        Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <header class="admin-topbar">
+    <a class="admin-marca" routerLink="/admin/resumen" aria-label="Ir al resumen del panel">
+      <span class="admin-marca__icono" aria-hidden="true">
+        <span class="material-symbols-outlined">straighten</span>
+      </span>
+      <span>
+        <strong>{{ tallerNombre().nombre }}</strong>
+        <small>Panel del taller</small>
+      </span>
+    </a>
+    <div class="admin-topbar__acciones">
+      <a class="admin-topbar__principal" routerLink="/" aria-label="Ir a la página principal del taller">
+        <span class="material-symbols-outlined" aria-hidden="true">storefront</span>
+        <span class="admin-topbar__principal-texto">Principal</span>
+      </a>
+      <button class="admin-topbar__salir" type="button" aria-label="Cerrar sesión" (click)="cerrarSesion()">
+        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-main">
+    <main id="contenido-admin" class="admin-contenido">
+      <router-outlet />
+    </main>
+  </div>
+
+  <nav class="admin-bottomnav" aria-label="Navegación móvil">
+    @for (enlace of enlaces; track enlace.ruta) {
+      <a
+        [routerLink]="enlace.ruta"
+        routerLinkActive="activo"
+        [routerLinkActiveOptions]="{ exact: enlace.exacto ?? false }">
+        <span class="material-symbols-outlined" aria-hidden="true">{{ enlace.icono }}</span>
+        {{ enlace.etiqueta }}
+      </a>
+    }
+  </nav>
+</div>
+
+<app-toast-stack />

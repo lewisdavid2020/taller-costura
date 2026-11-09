@@ -18,7 +18,8 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/admin.css"
             ],
             "outputPath": "dist/taller-costura"
           },
@@ -57,6 +58,14 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "taller-costura:build:development",
+            "tsConfig": "tsconfig.spec.json",
+            "runner": "vitest"
+          }
         }
       }
     }

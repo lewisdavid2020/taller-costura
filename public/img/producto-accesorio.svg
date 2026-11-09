@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="titulo">
+  <title id="titulo">Accesorio de costura artesanal</title>
+  <rect width="400" height="400" fill="#f4f6f8"/>
+  <g stroke="#dde3eb" stroke-width="1">
+    <path d="M0 80h400M0 160h400M0 240h400M0 320h400M80 0v400M160 0v400M240 0v400M320 0v400"/>
+  </g>
+  <g fill="#ffffff" stroke="#16213a" stroke-width="3" stroke-linejoin="round">
+    <path d="M128 118h104l16 24v126l-16 24H128l-16-24V142Z"/>
+    <path d="M112 142h136M112 268h136"/>
+    <rect x="136" y="84" width="88" height="34" rx="8"/>
+    <rect x="136" y="292" width="88" height="34" rx="8"/>
+  </g>
+  <g fill="none" stroke="#27406b" stroke-width="2.5" stroke-linecap="round">
+    <path d="M120 166h136M120 184h136M120 202h136M120 220h136M120 238h136M120 256h136"/>
+  </g>
+  <g fill="none" stroke="#c4352b" stroke-width="2.5" stroke-linecap="round">
+    <path d="M180 108c30 0 30 22 0 22s-30 22 0 22" />
+    <path d="M180 250c34-8 56 8 68 30"/>
+  </g>
+  <path d="M248 280 322 206" stroke="#16213a" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="326" cy="202" r="6" fill="none" stroke="#16213a" stroke-width="2.5"/>
+  <g fill="#f0c64a" stroke="#16213a" stroke-width="2">
+    <circle cx="96" cy="314" r="10"/>
+    <circle cx="96" cy="314" r="2.5" fill="#16213a"/>
+    <circle cx="118" cy="330" r="10"/>
+    <circle cx="118" cy="330" r="2.5" fill="#16213a"/>
+  </g>
+</svg>

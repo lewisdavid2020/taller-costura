@@ -10,21 +10,32 @@
       </span>
     </a>
 
-    <button
-      class="boton-menu"
-      type="button"
-      aria-controls="menu-principal"
-      [attr.aria-expanded]="menuAbierto"
-      [attr.aria-label]="menuAbierto ? 'Cerrar menú' : 'Abrir menú'"
-      (click)="alternarMenu()">
-      <span></span><span></span><span></span>
-    </button>
-
     <nav id="menu-principal" class="menu" [class.abierto]="menuAbierto">
       <a href="#servicios" (click)="cerrarMenu()">Servicios</a>
       <a href="#contacto" (click)="cerrarMenu()">Contacto</a>
       <a class="menu-cta" href="#contacto" (click)="cerrarMenu()">Cotizar ahora <span aria-hidden="true">↗</span></a>
     </nav>
+
+    <div class="barra-acciones">
+      <a
+        class="acceso"
+        [routerLink]="rutaAcceso()"
+        [attr.aria-label]="etiquetaAcceso() + ' del taller'"
+        (click)="cerrarMenu()">
+        <span class="material-symbols-outlined" aria-hidden="true">{{ iconoAcceso() }}</span>
+        <span class="acceso-texto">{{ etiquetaAcceso() }}</span>
+      </a>
+
+      <button
+        class="boton-menu"
+        type="button"
+        aria-controls="menu-principal"
+        [attr.aria-expanded]="menuAbierto"
+        [attr.aria-label]="menuAbierto ? 'Cerrar menú' : 'Abrir menú'"
+        (click)="alternarMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
   <div class="tape" aria-hidden="true"></div>
 </header>
