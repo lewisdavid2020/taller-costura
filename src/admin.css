@@ -583,6 +583,7 @@ select.adm-input {
 .auth-card__pie p { margin: 0; color: var(--adm-gris); font-size: 0.83rem; text-align: center; }
 .auth-card .adm-form { gap: 1rem; }
 .auth-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.auth-volver { margin-top: 1rem; }
 
 .auth-legal {
   margin: 1.25rem 0 0;

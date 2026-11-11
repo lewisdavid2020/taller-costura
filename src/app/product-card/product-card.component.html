@@ -1,0 +1,25 @@
+<article class="producto">
+  <div class="producto-media">
+    <span class="producto-numero">{{ numero < 10 ? '0' : '' }}{{ numero }}</span>
+
+    @if (imagen) {
+      <img [src]="imagen" [alt]="'Producto: ' + nombre" loading="lazy" />
+    } @else {
+      <span class="producto-icono material-symbols-outlined" aria-hidden="true">checkroom</span>
+    }
+
+    <span class="producto-categoria">{{ categoria }}</span>
+  </div>
+
+  <div class="producto-cuerpo">
+    <h3>{{ nombre }}</h3>
+    <p class="producto-descripcion">{{ descripcion }}</p>
+
+    <div class="producto-pie">
+      <span class="producto-precio">{{ precioFormateado }}</span>
+      <a class="producto-enlace" href="#contacto" [attr.aria-label]="'Cotizar ' + nombre">
+        Cotizar <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</article>

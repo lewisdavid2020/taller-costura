@@ -22,7 +22,7 @@ export class ContactComponent {
       `¡Hola! Me gustaría cotizar un trabajo en ${this.nombreTaller}.`,
       '',
       `Nombre: ${this.cliente.nombre.trim()}`,
-      `Servicio solicitado: ${this.cliente.servicio}`,
+      `Servicio o producto solicitado: ${this.cliente.servicio}`,
       this.cliente.mensaje.trim() ? `Detalle de la prenda: ${this.cliente.mensaje.trim()}` : '',
       '',
       '¿Podrían indicarme disponibilidad y costo estimado? Gracias.',

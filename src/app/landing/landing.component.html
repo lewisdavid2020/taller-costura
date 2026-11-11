@@ -25,6 +25,28 @@
             [numero]="indice + 1" />
         }
       </div>
+
+      @if (productos().length > 0) {
+        <div id="productos" class="productos-taller">
+          <div class="encabezado-seccion encabezado-seccion--productos">
+            <p class="catalogo"><span class="material-symbols-outlined" aria-hidden="true">checkroom</span>Piezas del taller</p>
+            <h2>Productos del taller</h2>
+            <p class="intro">Prendas y piezas confeccionadas por nosotros. Consulta cada modelo y solicita su cotización.</p>
+          </div>
+
+          <div class="rejilla-productos">
+            @for (producto of productos(); track producto.id; let indice = $index) {
+              <app-product-card
+                [nombre]="producto.nombre"
+                [descripcion]="producto.descripcion"
+                [categoria]="producto.categoria"
+                [precio]="producto.precio"
+                [imagen]="producto.imagenes[0] ?? ''"
+                [numero]="indice + 1" />
+            }
+          </div>
+        </div>
+      }
     </div>
   </section>
 
@@ -43,7 +65,7 @@
     </a>
     <p>© {{ anio }} {{ nombreTaller }}. Todos los derechos reservados.</p>
     <nav aria-label="Enlaces del pie de página">
-      <a href="#servicios">Servicios</a><span aria-hidden="true">•</span><a href="#contacto">Contacto</a>
+      <a href="#servicios">Servicios</a><span aria-hidden="true">•</span><a href="#productos">Productos</a><span aria-hidden="true">•</span><a href="#contacto">Contacto</a>
     </nav>
   </div>
 </footer>

@@ -1,17 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { CatalogService } from '../admin/core/catalog.service';
 import { HeaderComponent } from '../header/header.component';
 import { HeroComponent } from '../hero/hero.component';
+import { ProductCardComponent } from '../product-card/product-card.component';
 import { ServiceCardComponent } from '../service-card/service-card.component';
 import { ContactComponent } from '../contact/contact.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [HeaderComponent, HeroComponent, ServiceCardComponent, ContactComponent],
+  imports: [HeaderComponent, HeroComponent, ProductCardComponent, ServiceCardComponent, ContactComponent],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css',
 })
 export class LandingComponent {
+  private readonly catalogo = inject(CatalogService);
+
+  // Solo se muestran al público los productos marcados como activos en el panel.
+  readonly productos = computed(() => this.catalogo.productos().filter((producto) => producto.estado === 'activo'));
+
   // Cambia aquí el nombre de tu negocio y tu WhatsApp (con código de país, sin + ni espacios).
   nombreTaller = 'Nombre del Taller';
   whatsapp = '00000000000';
@@ -47,6 +54,6 @@ export class LandingComponent {
 
   // Lista de nombres para el selector del formulario de contacto.
   get titulosServicios(): string[] {
-    return this.servicios.map((s) => s.titulo);
+    return [...new Set([...this.servicios.map((s) => s.titulo), ...this.productos().map((p) => p.nombre)])];
   }
 }

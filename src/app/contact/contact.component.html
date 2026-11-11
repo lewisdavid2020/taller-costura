@@ -51,10 +51,10 @@
         </div>
 
         <div class="campo">
-          <label for="servicio">Servicio que necesitas <span aria-hidden="true">*</span></label>
+          <label for="servicio">Servicio o producto que necesitas <span aria-hidden="true">*</span></label>
           <div class="campo-control">
             <select id="servicio" name="servicio" [(ngModel)]="cliente.servicio" required>
-              <option value="" disabled>Selecciona un servicio...</option>
+              <option value="" disabled>Selecciona una opción...</option>
               @for (servicio of servicios; track servicio) {
                 <option [value]="servicio">{{ servicio }}</option>
               }

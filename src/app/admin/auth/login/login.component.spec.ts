@@ -23,6 +23,15 @@ describe('LoginComponent', () => {
     expect(fixture.nativeElement.querySelector('#login-contrasena')).toBeTruthy();
   });
 
+  it('ofrece volver a la página principal', () => {
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+
+    const volver = (fixture.nativeElement as HTMLElement).querySelector('.auth-volver');
+    expect(volver?.textContent).toContain('Volver a la página principal');
+    expect(volver?.getAttribute('href')).toBe('/');
+  });
+
   it('bloquea el envío y muestra error cuando los campos están vacíos', async () => {
     const fixture = TestBed.createComponent(LoginComponent);
     const componente = fixture.componentInstance;

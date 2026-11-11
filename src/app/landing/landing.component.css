@@ -53,6 +53,21 @@
   gap: 1.1rem;
 }
 
+.productos-taller {
+  margin-top: 3.25rem;
+  padding-top: 3rem;
+  border-top: 1px dashed var(--linea-oscura);
+}
+
+.encabezado-seccion--productos { margin-bottom: 2rem; }
+
+.rejilla-productos {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 1.1rem;
+}
+
 .pie { border-top: 2px solid var(--cinta); background: var(--tinta); color: var(--papel); }
 .pie .tape { height: 8px; border: 0; background: var(--cinta); }
 .pie .tape::after { display: none; }
@@ -66,6 +81,10 @@
 .pie-contenido nav a { text-decoration: none; }
 .pie-contenido nav a:hover { color: var(--papel); text-decoration: underline; }
 
+@media (min-width: 560px) {
+  .rejilla-productos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (min-width: 700px) {
   .rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
   .pie-contenido { flex-direction: row; justify-content: space-between; gap: 1.5rem; text-align: left; }
@@ -74,5 +93,8 @@
 @media (min-width: 860px) {
   .servicios { padding: 5rem 0 5.5rem; }
   .encabezado-seccion { margin-bottom: 3rem; }
+  .encabezado-seccion--productos { margin-bottom: 2.25rem; }
   .servicios h2 { font-size: 2rem; }
+  .productos-taller { margin-top: 4.5rem; padding-top: 4rem; }
+  .rejilla-productos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 }
