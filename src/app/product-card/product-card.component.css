@@ -22,7 +22,7 @@
   position: relative;
   display: grid;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   place-items: center;
   border-bottom: 1px dashed var(--linea);
   background:
@@ -32,13 +32,11 @@
 }
 
 .producto-media img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 260ms ease;
+  object-fit: contain;
 }
-
-.producto:hover .producto-media img { transform: scale(1.04); }
 
 .producto-icono { color: var(--denim); font-size: 3rem; }
 
@@ -127,6 +125,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .producto,
-  .producto-media img,
   .producto-enlace { transition: none; }
 }
