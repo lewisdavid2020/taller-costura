@@ -33,6 +33,22 @@ export interface Pedido {
   entrega: string;
   total: number;
   estado: EstadoPedido;
+  solicitudId?: string;
+  creadoPor?: string;
+}
+
+export type EstadoSolicitud = 'nueva' | 'contactada' | 'convertida' | 'descartada';
+
+export interface SolicitudCotizacion {
+  id: string;
+  nombre: string;
+  correo: string;
+  telefono: string;
+  servicio: string;
+  tipoSolicitud: string;
+  mensaje: string;
+  estado: EstadoSolicitud;
+  creadoEn: string;
 }
 
 export interface ClienteResumen {

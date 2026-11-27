@@ -57,6 +57,11 @@ export const routes: Routes = [
         title: 'Pedidos — Panel del taller',
       },
       {
+        path: 'solicitudes',
+        loadComponent: () => import('./admin/requests/requests.component').then((m) => m.RequestsComponent),
+        title: 'Solicitudes — Panel del taller',
+      },
+      {
         path: 'clientes',
         loadComponent: () => import('./admin/clients/clients.component').then((m) => m.ClientsComponent),
         title: 'Clientes — Panel del taller',

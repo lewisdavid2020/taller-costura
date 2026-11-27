@@ -2,13 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CatalogService } from '../admin/core/catalog.service';
+import { proveedoresSupabaseFake } from '../admin/core/testing/proveedores-fake';
+import { establecerFilas, reiniciarSupabaseFake } from '../admin/core/testing/supabase-fake';
 import { LandingComponent } from './landing.component';
 
 async function configurar(): Promise<void> {
   TestBed.resetTestingModule();
   await TestBed.configureTestingModule({
     imports: [LandingComponent],
-    providers: [provideRouter([])],
+    providers: [provideRouter([]), ...proveedoresSupabaseFake()],
   }).compileComponents();
 }
 
@@ -18,23 +20,30 @@ function montar(): HTMLElement {
   return fixture.nativeElement as HTMLElement;
 }
 
+function filaProducto(nombre: string, estado: 'activo' | 'oculto') {
+  return {
+    id: nombre,
+    nombre,
+    descripcion: 'Descripción del producto de prueba.',
+    categoria: 'Confección' as const,
+    precio: 540,
+    imagenes: [],
+    estado,
+    created_at: new Date().toISOString(),
+  };
+}
+
 describe('LandingComponent', () => {
   beforeEach(() => {
     localStorage.clear();
+    reiniciarSupabaseFake();
   });
 
-  it('publica los productos activos creados desde el panel', async () => {
+  it('publica los productos activos del catálogo', async () => {
     await configurar();
     const catalogo = TestBed.inject(CatalogService);
-
-    catalogo.crear({
-      nombre: 'Blusa de seda a medida',
-      descripcion: 'Blusa confeccionada a medida con acabados a mano y prueba de calce.',
-      categoria: 'Confección',
-      precio: 540,
-      imagenes: [],
-      estado: 'activo',
-    });
+    establecerFilas({ products: [filaProducto('Blusa de seda a medida', 'activo')] });
+    await catalogo.cargar();
 
     const elemento = montar();
     const texto = elemento.textContent ?? '';
@@ -48,15 +57,8 @@ describe('LandingComponent', () => {
   it('mantiene fuera de la página pública los productos ocultos', async () => {
     await configurar();
     const catalogo = TestBed.inject(CatalogService);
-
-    catalogo.crear({
-      nombre: 'Muestra confidencial del taller',
-      descripcion: 'Producto de prueba que no debe aparecer en la página pública.',
-      categoria: 'Accesorios',
-      precio: 100,
-      imagenes: [],
-      estado: 'oculto',
-    });
+    establecerFilas({ products: [filaProducto('Muestra confidencial del taller', 'oculto')] });
+    await catalogo.cargar();
 
     const elemento = montar();
 

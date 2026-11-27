@@ -1398,6 +1398,19 @@
 
 .landing .ok.show { display: block; }
 
+.landing .error {
+  display: none;
+  padding: 13px 15px;
+  border: 1px solid #d9b1a6;
+  border-radius: 10px;
+  background: #f8e6e1;
+  color: #7a2f1d;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.landing .error.show { display: block; }
+
 .landing form .note {
   margin-top: -4px;
   color: var(--muted);

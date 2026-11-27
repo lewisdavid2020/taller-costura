@@ -1,5 +1,5 @@
-import { Injectable, signal } from '@angular/core';
-import { supabase, supabaseConfigurado } from './supabase.client';
+import { Injectable, inject, signal } from '@angular/core';
+import { SUPABASE_CLIENTE, SUPABASE_CONFIGURADO } from './supabase.client';
 import { DatosTaller } from './modelos';
 
 const DATOS_INICIALES: DatosTaller = {
@@ -12,6 +12,8 @@ const DATOS_INICIALES: DatosTaller = {
 
 @Injectable({ providedIn: 'root' })
 export class WorkshopService {
+  private readonly supabase = inject(SUPABASE_CLIENTE);
+  private readonly configurado = inject(SUPABASE_CONFIGURADO);
   private readonly datosState = signal<DatosTaller>({ ...DATOS_INICIALES });
   readonly datos = this.datosState.asReadonly();
 
@@ -20,8 +22,8 @@ export class WorkshopService {
   }
 
   async cargar(): Promise<void> {
-    if (!supabaseConfigurado) return;
-    const { data, error } = await supabase
+    if (!this.configurado) return;
+    const { data, error } = await this.supabase
       .from('workshop_settings')
       .select('nombre,whatsapp,direccion,horario,correo')
       .eq('id', true)
@@ -34,9 +36,9 @@ export class WorkshopService {
   async guardar(datos: DatosTaller): Promise<boolean> {
     const normalizados = this.normalizar(datos);
     this.datosState.set(normalizados);
-    if (!supabaseConfigurado) return true;
+    if (!this.configurado) return true;
 
-    const { error } = await supabase
+    const { error } = await this.supabase
       .from('workshop_settings')
       .upsert({ id: true, ...normalizados }, { onConflict: 'id' });
 

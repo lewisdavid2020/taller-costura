@@ -1,6 +1,6 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { supabase, supabaseConfigurado } from './supabase.client';
-import { ClienteResumen, EstadoPedido, Pedido } from './modelos';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { SUPABASE_CLIENTE, SUPABASE_CONFIGURADO } from './supabase.client';
+import { ClienteResumen, EstadoPedido, Pedido, SolicitudCotizacion } from './modelos';
 import { mesCorto } from './formato';
 
 interface PedidoFila {
@@ -14,10 +14,14 @@ interface PedidoFila {
   entrega: string;
   total: number | string;
   estado: EstadoPedido;
+  solicitud_id?: string | null;
+  creado_por?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
+  private readonly supabase = inject(SUPABASE_CLIENTE);
+  private readonly configurado = inject(SUPABASE_CONFIGURADO);
   private readonly pedidosState = signal<Pedido[]>([]);
   private readonly cargandoState = signal(false);
 
@@ -103,11 +107,11 @@ export class OrdersService {
   }
 
   async cargar(): Promise<void> {
-    if (!supabaseConfigurado) return;
+    if (!this.configurado) return;
     this.cargandoState.set(true);
-    const { data, error } = await supabase
+    const { data, error } = await this.supabase
       .from('orders')
-      .select('id,folio,cliente,correo,telefono,servicio,fecha,entrega,total,estado')
+      .select('id,folio,cliente,correo,telefono,servicio,fecha,entrega,total,estado,solicitud_id,creado_por')
       .order('fecha', { ascending: false });
 
     this.cargandoState.set(false);
@@ -116,13 +120,41 @@ export class OrdersService {
   }
 
   async cambiarEstado(id: string, estado: EstadoPedido): Promise<boolean> {
-    if (!supabaseConfigurado) return false;
-    const { error } = await supabase.from('orders').update({ estado }).eq('id', id);
+    if (!this.configurado) return false;
+    const { error } = await this.supabase.from('orders').update({ estado }).eq('id', id);
     if (error) return false;
     this.pedidosState.update((pedidos) =>
       pedidos.map((pedido) => (pedido.id === id ? { ...pedido, estado } : pedido)),
     );
     return true;
+  }
+
+  /** Crea un pedido a partir de una solicitud y las deja relacionadas. */
+  async convertirSolicitud(
+    solicitud: SolicitudCotizacion,
+    datos: { total: number; entrega: string },
+  ): Promise<Pedido | null> {
+    if (!this.configurado) return null;
+
+    const fecha = datos.entrega.includes('T')
+      ? new Date(datos.entrega)
+      : new Date(`${datos.entrega}T12:00:00`);
+    if (Number.isNaN(fecha.getTime())) return null;
+
+    const { data, error } = await this.supabase.rpc('convertir_solicitud_en_pedido', {
+      p_solicitud_id: solicitud.id,
+      p_total: datos.total,
+      p_entrega: fecha.toISOString(),
+    });
+
+    if (error || !data) return null;
+
+    const fila = Array.isArray(data) ? data[0] : data;
+    if (!fila) return null;
+
+    const pedido = this.mapearPedido(fila as PedidoFila);
+    this.pedidosState.update((pedidos) => [pedido, ...pedidos]);
+    return pedido;
   }
 
   private sumaEntregados(mesesAtras: number): number {
@@ -149,6 +181,8 @@ export class OrdersService {
       entrega: fila.entrega,
       total: Number(fila.total),
       estado: fila.estado,
+      solicitudId: fila.solicitud_id ?? undefined,
+      creadoPor: fila.creado_por ?? undefined,
     };
   }
 }

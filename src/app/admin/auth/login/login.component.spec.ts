@@ -1,14 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { proveedoresSupabaseFake } from '../../core/testing/proveedores-fake';
+import { reiniciarSupabaseFake } from '../../core/testing/supabase-fake';
 import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
   beforeEach(async () => {
     localStorage.clear();
+    reiniciarSupabaseFake();
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), ...proveedoresSupabaseFake()],
     }).compileComponents();
   });
 

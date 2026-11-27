@@ -1,5 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { supabase, supabaseConfigurado } from './supabase.client';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { SUPABASE_CLIENTE, SUPABASE_CONFIGURADO } from './supabase.client';
 import { CategoriaProducto, EstadoProducto, Producto } from './modelos';
 
 interface ProductoFila {
@@ -15,6 +15,8 @@ interface ProductoFila {
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
+  private readonly supabase = inject(SUPABASE_CLIENTE);
+  private readonly configurado = inject(SUPABASE_CONFIGURADO);
   private readonly productosState = signal<Producto[]>([]);
   private readonly cargandoState = signal(false);
 
@@ -29,9 +31,9 @@ export class CatalogService {
   }
 
   async cargar(): Promise<void> {
-    if (!supabaseConfigurado) return;
+    if (!this.configurado) return;
     this.cargandoState.set(true);
-    const { data, error } = await supabase
+    const { data, error } = await this.supabase
       .from('products')
       .select('id,nombre,descripcion,categoria,precio,imagenes,estado,created_at')
       .order('created_at', { ascending: false });
@@ -46,9 +48,9 @@ export class CatalogService {
   }
 
   async crear(datos: Omit<Producto, 'id' | 'creadoEn'>): Promise<Producto | null> {
-    if (!supabaseConfigurado) return null;
+    if (!this.configurado) return null;
     const imagenes = await this.prepararImagenes(datos.imagenes);
-    const { data, error } = await supabase
+    const { data, error } = await this.supabase
       .from('products')
       .insert({
         nombre: datos.nombre.trim(),
@@ -68,9 +70,9 @@ export class CatalogService {
   }
 
   async actualizar(id: string, datos: Omit<Producto, 'id' | 'creadoEn'>): Promise<Producto | null> {
-    if (!supabaseConfigurado) return null;
+    if (!this.configurado) return null;
     const imagenes = await this.prepararImagenes(datos.imagenes);
-    const { data, error } = await supabase
+    const { data, error } = await this.supabase
       .from('products')
       .update({
         nombre: datos.nombre.trim(),
@@ -91,8 +93,8 @@ export class CatalogService {
   }
 
   async eliminar(id: string): Promise<boolean> {
-    if (!supabaseConfigurado) return false;
-    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (!this.configurado) return false;
+    const { error } = await this.supabase.from('products').delete().eq('id', id);
     if (error) return false;
     this.productosState.update((productos) => productos.filter((p) => p.id !== id));
     return true;
@@ -116,12 +118,12 @@ export class CatalogService {
     const archivo = this.dataUrlAArchivo(dataUrl, indice);
     if (!archivo) return null;
     const ruta = `productos/${Date.now()}-${indice}-${Math.random().toString(36).slice(2, 10)}.${archivo.ext}`;
-    const { error } = await supabase.storage.from('product-images').upload(ruta, archivo.blob, {
+    const { error } = await this.supabase.storage.from('product-images').upload(ruta, archivo.blob, {
       contentType: archivo.mime,
       upsert: false,
     });
     if (error) return null;
-    const { data } = supabase.storage.from('product-images').getPublicUrl(ruta);
+    const { data } = this.supabase.storage.from('product-images').getPublicUrl(ruta);
     return data.publicUrl;
   }
 

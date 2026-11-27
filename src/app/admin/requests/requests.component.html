@@ -1,0 +1,258 @@
+<app-page-header
+  eyebrow="Contacto del sitio público"
+  titulo="Solicitudes"
+  [descripcion]="
+    solicitudes().length + ' cotizaciones recibidas desde la página pública. Revisa el detalle y dales seguimiento.'
+  ">
+  <button
+    class="adm-btn adm-btn--fantasma"
+    type="button"
+    [disabled]="cargando()"
+    (click)="recargar()">
+    <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+    {{ cargando() ? 'Actualizando…' : 'Actualizar' }}
+  </button>
+</app-page-header>
+
+<div class="filtros-fila" role="group" aria-label="Filtrar solicitudes por estado">
+  <button
+    class="adm-btn adm-btn--sm"
+    [class.adm-btn--primario]="filtro() === 'todas'"
+    [class.adm-btn--fantasma]="filtro() !== 'todas'"
+    type="button"
+    [attr.aria-pressed]="filtro() === 'todas'"
+    (click)="filtro.set('todas')">
+    Todas <span class="adm-mono">({{ contar('todas') }})</span>
+  </button>
+  @for (estado of estados; track estado) {
+    <button
+      class="adm-btn adm-btn--sm"
+      [class.adm-btn--primario]="filtro() === estado"
+      [class.adm-btn--fantasma]="filtro() !== estado"
+      type="button"
+      [attr.aria-pressed]="filtro() === estado"
+      (click)="filtro.set(estado)">
+      {{ etiqueta(estado) }} <span class="adm-mono">({{ contar(estado) }})</span>
+    </button>
+  }
+</div>
+
+@if (solicitudes().length === 0) {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">mark_email_read</span>
+    </span>
+    <h2>Aún no hay solicitudes</h2>
+    <p>Las cotizaciones enviadas desde el formulario público aparecerán aquí automáticamente.</p>
+  </div>
+} @else if (sinResultados()) {
+  <div class="adm-card empty-state">
+    <span class="empty-state__icono" aria-hidden="true">
+      <span class="material-symbols-outlined">filter_alt_off</span>
+    </span>
+    <h2>No hay solicitudes en este estado</h2>
+    <p>Prueba con otro filtro para ver las cotizaciones recibidas.</p>
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="filtro.set('todas')">
+      Ver todas
+    </button>
+  </div>
+} @else {
+  <div class="adm-card data-card solicitud-tabla">
+    <div class="data-tabla-scroll">
+      <table class="data-tabla">
+        <thead>
+          <tr>
+            <th scope="col">Recibida</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Contacto</th>
+            <th scope="col">Servicio</th>
+            <th scope="col">Detalle</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Actualizar estado</th>
+            <th scope="col">Pedido</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (solicitud of filtradas(); track solicitud.id) {
+            <tr>
+              <td>{{ formatearFecha(solicitud.creadoEn) }}</td>
+              <td>
+                <span class="data-tabla__numero">{{ solicitud.nombre }}</span>
+                <span class="data-tabla__sub">{{ solicitud.tipoSolicitud }}</span>
+              </td>
+              <td>
+                <span class="solicitud-contacto">
+                  <a [href]="enlaceCorreo(solicitud)">{{ solicitud.correo }}</a>
+                  @if (solicitud.telefono) {
+                    <a [href]="enlaceWhatsApp(solicitud)" target="_blank" rel="noopener">
+                      {{ solicitud.telefono }}
+                    </a>
+                  } @else {
+                    <span class="data-tabla__sub">Sin teléfono</span>
+                  }
+                </span>
+              </td>
+              <td>{{ solicitud.servicio }}</td>
+              <td>
+                <span class="solicitud-mensaje">{{ solicitud.mensaje || 'Sin detalle adicional' }}</span>
+              </td>
+              <td>
+                <span [class]="'estado ' + clase(solicitud.estado)">{{ etiqueta(solicitud.estado) }}</span>
+              </td>
+              <td>
+                <label class="adm-sr-only" [for]="'solicitud-' + solicitud.id">
+                  Estado de la solicitud de {{ solicitud.nombre }}
+                </label>
+                <select
+                  class="adm-input selector-estado"
+                  [id]="'solicitud-' + solicitud.id"
+                  [value]="solicitud.estado"
+                  (change)="cambiarEstado(solicitud, $event)">
+                  @for (estado of estados; track estado) {
+                    <option [value]="estado">{{ etiqueta(estado) }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                @if (solicitud.estado === 'convertida') {
+                  <span class="conversion__nota">Pedido creado</span>
+                } @else if (convirtiendo() === solicitud.id) {
+                  <div class="conversion">
+                    <div class="conversion__campos">
+                      <label>
+                        Total (RD$)
+                        <input
+                          class="adm-input"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          [ngModel]="totalConversion()"
+                          (ngModelChange)="totalConversion.set($event)" />
+                      </label>
+                      <label>
+                        Entrega
+                        <input
+                          class="adm-input"
+                          type="date"
+                          [ngModel]="entregaConversion()"
+                          (ngModelChange)="entregaConversion.set($event)" />
+                      </label>
+                    </div>
+                    <div class="conversion__acciones">
+                      <button class="adm-btn adm-btn--primario adm-btn--sm" type="button" (click)="convertir(solicitud)">
+                        Crear pedido
+                      </button>
+                      <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="cancelarConversion()">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                } @else if (puedeConvertir(solicitud)) {
+                  <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="abrirConversion(solicitud)">
+                    Convertir
+                  </button>
+                } @else {
+                  <span class="conversion__nota">—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="productos-pie">
+      <p>Mostrando {{ filtradas().length }} solicitudes</p>
+    </div>
+  </div>
+
+  <div class="lista-solicitudes-movil" aria-label="Lista de solicitudes">
+    @for (solicitud of filtradas(); track solicitud.id) {
+      <article class="solicitud-movil">
+        <header class="solicitud-movil__cabecera">
+          <span class="data-tabla__numero">{{ formatearFecha(solicitud.creadoEn) }}</span>
+          <span [class]="'estado ' + clase(solicitud.estado)">{{ etiqueta(solicitud.estado) }}</span>
+        </header>
+
+        <div>
+          <h3 class="solicitud-movil__cliente">{{ solicitud.nombre }}</h3>
+          <p class="solicitud-movil__servicio">{{ solicitud.servicio }} · {{ solicitud.tipoSolicitud }}</p>
+        </div>
+
+        <p class="solicitud-mensaje">{{ solicitud.mensaje || 'Sin detalle adicional' }}</p>
+
+        <dl class="solicitud-movil__datos">
+          <div>
+            <dt>Correo</dt>
+            <dd><a [href]="enlaceCorreo(solicitud)">{{ solicitud.correo }}</a></dd>
+          </div>
+          <div>
+            <dt>Teléfono</dt>
+            <dd>
+              @if (solicitud.telefono) {
+                <a [href]="enlaceWhatsApp(solicitud)" target="_blank" rel="noopener">{{ solicitud.telefono }}</a>
+              } @else {
+                Sin teléfono
+              }
+            </dd>
+          </div>
+        </dl>
+
+        <label class="solicitud-movil__estado">
+          <span>Actualizar estado</span>
+          <select
+            class="adm-input selector-estado"
+            [value]="solicitud.estado"
+            (change)="cambiarEstado(solicitud, $event)">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ etiqueta(estado) }}</option>
+            }
+          </select>
+        </label>
+
+        <div class="solicitud-movil__estado">
+          <span>Pedido</span>
+          @if (solicitud.estado === 'convertida') {
+            <p class="conversion__nota">Pedido creado</p>
+          } @else if (convirtiendo() === solicitud.id) {
+            <div class="conversion">
+              <div class="conversion__campos">
+                <label>
+                  Total (RD$)
+                  <input
+                    class="adm-input"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    [ngModel]="totalConversion()"
+                    (ngModelChange)="totalConversion.set($event)" />
+                </label>
+                <label>
+                  Entrega
+                  <input
+                    class="adm-input"
+                    type="date"
+                    [ngModel]="entregaConversion()"
+                    (ngModelChange)="entregaConversion.set($event)" />
+                </label>
+              </div>
+              <div class="conversion__acciones">
+                <button class="adm-btn adm-btn--primario adm-btn--sm" type="button" (click)="convertir(solicitud)">
+                  Crear pedido
+                </button>
+                <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="cancelarConversion()">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          } @else if (puedeConvertir(solicitud)) {
+            <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="abrirConversion(solicitud)">
+              Convertir en pedido
+            </button>
+          } @else {
+            <p class="conversion__nota">—</p>
+          }
+        </div>
+      </article>
+    }
+  </div>
+}

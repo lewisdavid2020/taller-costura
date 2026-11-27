@@ -51,6 +51,32 @@
       </label>
 
       <div class="row">
+        <label for="contacto-correo">
+          Tu correo electrónico
+          <input
+            id="contacto-correo"
+            name="correo"
+            type="email"
+            autocomplete="email"
+            placeholder="Ej. carmen@correo.com"
+            [(ngModel)]="cliente.correo"
+            required />
+        </label>
+
+        <label for="contacto-telefono">
+          Tu teléfono (opcional)
+          <input
+            id="contacto-telefono"
+            name="telefono"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="Ej. 300 123 4567"
+            [(ngModel)]="cliente.telefono" />
+        </label>
+      </div>
+
+      <div class="row">
         <label for="contacto-servicio">
           Servicio o producto
           <select
@@ -86,20 +112,24 @@
           [(ngModel)]="cliente.mensaje"></textarea>
       </label>
 
-      <button class="btn" type="submit" [disabled]="f.invalid">
-        Enviar por WhatsApp
+      <button class="btn" type="submit" [disabled]="f.invalid || enviando() || (enviado() && guardado())">
+        {{ enviando() ? 'Enviando…' : 'Enviar cotización por WhatsApp' }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
 
-      @if (enviado()) {
+      @if (enviado() && guardado()) {
         <p class="ok show" role="status">
-          Abrimos WhatsApp con tu mensaje listo para enviar.
+          Abrimos WhatsApp con tu mensaje listo para enviar y registramos tu solicitud en el panel del taller.
         </p>
       }
 
-      <p class="note">Sin registros ni formularios complicados: atención directa del taller.</p>
+      @if (error()) {
+        <p class="error show" role="alert">{{ error() }}</p>
+      }
+
+      <p class="note">Tu solicitud queda registrada para que el taller pueda darte seguimiento.</p>
     </form>
   </div>
 </section>

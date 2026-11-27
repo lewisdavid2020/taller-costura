@@ -45,7 +45,12 @@
         <tbody>
           @for (pedido of filtrados(); track pedido.id) {
             <tr>
-              <td><span class="data-tabla__numero">{{ pedido.folio }}</span></td>
+              <td>
+                <span class="data-tabla__numero">{{ pedido.folio }}</span>
+                @if (pedido.solicitudId) {
+                  <span class="data-tabla__sub">Desde solicitud</span>
+                }
+              </td>
               <td>
                 <span class="data-tabla__numero">{{ pedido.cliente }}</span>
                 <span class="data-tabla__sub">{{ pedido.correo }}</span>
@@ -81,7 +86,12 @@
     @for (pedido of filtrados(); track pedido.id) {
       <article class="pedido-movil">
         <header class="pedido-movil__cabecera">
-          <span class="data-tabla__numero">{{ pedido.folio }}</span>
+          <div>
+            <span class="data-tabla__numero">{{ pedido.folio }}</span>
+            @if (pedido.solicitudId) {
+              <span class="data-tabla__sub">Desde solicitud</span>
+            }
+          </div>
           <app-estado-badge [estado]="pedido.estado" />
         </header>
 

@@ -1,4 +1,4 @@
-import { CategoriaProducto, EstadoPedido, EstadoProducto } from './modelos';
+import { CategoriaProducto, EstadoPedido, EstadoProducto, EstadoSolicitud } from './modelos';
 
 export const CATEGORIAS_PRODUCTO: CategoriaProducto[] = [
   'Arreglos',
@@ -27,6 +27,22 @@ export const CLASE_ESTADO: Record<EstadoPedido, string> = {
   'en proceso': 'estado--proceso',
   listo: 'estado--listo',
   entregado: 'estado--entregado',
+};
+
+export const ESTADOS_SOLICITUD: EstadoSolicitud[] = ['nueva', 'contactada', 'convertida', 'descartada'];
+
+export const ETIQUETA_SOLICITUD: Record<EstadoSolicitud, string> = {
+  nueva: 'Nueva',
+  contactada: 'Contactada',
+  convertida: 'Convertida',
+  descartada: 'Descartada',
+};
+
+export const CLASE_SOLICITUD: Record<EstadoSolicitud, string> = {
+  nueva: 'estado--pendiente',
+  contactada: 'estado--proceso',
+  convertida: 'estado--listo',
+  descartada: 'estado--entregado',
 };
 
 export const ICONO_CATEGORIA: Record<CategoriaProducto, string> = {

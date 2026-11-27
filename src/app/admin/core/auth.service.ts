@@ -1,5 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { supabase, supabaseConfigurado } from './supabase.client';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { SUPABASE_CLIENTE, SUPABASE_CONFIGURADO } from './supabase.client';
 import { Administrador, ResultadoAcceso } from './modelos';
 
 interface RegistroAdministrador {
@@ -13,11 +13,15 @@ const CODIGO_INVITACION = 'TALLER-2026';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly supabase = inject(SUPABASE_CLIENTE);
+  private readonly configurado = inject(SUPABASE_CONFIGURADO);
   private readonly sesionActual = signal<Administrador | null>(null);
   private readonly listoState = signal(false);
+  private readonly esAdminState = signal(false);
 
   readonly sesion = this.sesionActual.asReadonly();
   readonly autenticado = computed(() => this.sesionActual() !== null);
+  readonly esAdmin = this.esAdminState.asReadonly();
   readonly listo = this.listoState.asReadonly();
 
   constructor() {
@@ -25,36 +29,43 @@ export class AuthService {
   }
 
   async inicializar(): Promise<void> {
-    if (!supabaseConfigurado) {
+    if (!this.configurado) {
       this.listoState.set(true);
       return;
     }
 
-    const { data } = await supabase.auth.getSession();
+    const { data } = await this.supabase.auth.getSession();
     if (data.session?.user) {
       this.sesionActual.set(this.mapearUsuario(data.session.user));
-      void this.cargarPerfil(data.session.user.id, data.session.user.email ?? '');
+      await Promise.all([
+        this.cargarPerfil(data.session.user.id, data.session.user.email ?? ''),
+        this.cargarRol(data.session.user.id),
+      ]);
+    } else {
+      this.esAdminState.set(false);
     }
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    this.supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user;
       if (!user) {
         this.sesionActual.set(null);
+        this.esAdminState.set(false);
         return;
       }
       this.sesionActual.set(this.mapearUsuario(user));
       void this.cargarPerfil(user.id, user.email ?? '');
+      void this.cargarRol(user.id);
     });
 
     this.listoState.set(true);
   }
 
   async iniciarSesion(correo: string, contrasena: string): Promise<ResultadoAcceso> {
-    if (!supabaseConfigurado) {
+    if (!this.configurado) {
       return { ok: false, error: 'Supabase no está configurado. Agrega tu anon key en environments.' };
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await this.supabase.auth.signInWithPassword({
       email: correo.trim().toLowerCase(),
       password: contrasena,
     });
@@ -65,13 +76,24 @@ export class AuthService {
 
     if (data.user) {
       this.sesionActual.set(this.mapearUsuario(data.user));
-      await this.cargarPerfil(data.user.id, data.user.email ?? correo);
+      await Promise.all([
+        this.cargarPerfil(data.user.id, data.user.email ?? correo),
+        this.cargarRol(data.user.id),
+      ]);
+    }
+    if (!this.esAdminState()) {
+      if (this.configurado) await this.supabase.auth.signOut();
+      this.sesionActual.set(null);
+      return {
+        ok: false,
+        error: 'Tu cuenta no tiene permisos de administrador.',
+      };
     }
     return { ok: true };
   }
 
   async registrar(datos: RegistroAdministrador): Promise<ResultadoAcceso> {
-    if (!supabaseConfigurado) {
+    if (!this.configurado) {
       return { ok: false, error: 'Supabase no está configurado. Agrega tu anon key en environments.' };
     }
 
@@ -85,7 +107,7 @@ export class AuthService {
 
     const correo = datos.correo.trim().toLowerCase();
     const nombre = datos.nombre.trim();
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await this.supabase.auth.signUp({
       email: correo,
       password: datos.contrasena,
       options: {
@@ -104,21 +126,43 @@ export class AuthService {
         correo,
         creadoEn: data.user.created_at ?? new Date().toISOString(),
       });
-      await this.cargarPerfil(data.user.id, correo);
+      await Promise.all([this.cargarPerfil(data.user.id, correo), this.cargarRol(data.user.id)]);
+    }
+
+    if (!this.esAdminState()) {
+      if (this.configurado) await this.supabase.auth.signOut();
+      this.sesionActual.set(null);
+      return {
+        ok: false,
+        error:
+          'La cuenta fue creada, pero no tiene rol de administrador. Un administrador debe asignarte el rol antes de ingresar.',
+      };
     }
 
     return { ok: true };
   }
 
   async cerrarSesion(): Promise<void> {
-    if (supabaseConfigurado) {
-      await supabase.auth.signOut();
+    if (this.configurado) {
+      await this.supabase.auth.signOut();
     }
     this.sesionActual.set(null);
+    this.esAdminState.set(false);
+  }
+
+  private async cargarRol(userId: string): Promise<void> {
+    const { data, error } = await this.supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (this.sesionActual()?.id !== userId) return;
+    this.esAdminState.set(!error && data?.role === 'admin');
   }
 
   private async cargarPerfil(userId: string, correoFallback: string): Promise<void> {
-    const { data } = await supabase
+    const { data } = await this.supabase
       .from('profiles')
       .select('id,nombre,correo,created_at')
       .eq('id', userId)

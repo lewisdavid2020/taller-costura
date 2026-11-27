@@ -1,63 +1,122 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { EstadoPedido } from './modelos';
 import { OrdersService } from './orders.service';
+import { proveedoresSupabaseFake } from './testing/proveedores-fake';
+import { establecerFilas, reiniciarSupabaseFake } from './testing/supabase-fake';
 
 function crearServicio(): OrdersService {
   TestBed.resetTestingModule();
-  TestBed.configureTestingModule({ providers: [OrdersService] });
+  TestBed.configureTestingModule({ providers: [...proveedoresSupabaseFake(), OrdersService] });
   return TestBed.inject(OrdersService);
 }
+
+function filaPedido(id: string, estado: EstadoPedido, fecha: string, total: number, servicio: string, correo: string) {
+  return {
+    id,
+    folio: `FO-${id}`,
+    cliente: 'Cliente de prueba',
+    correo,
+    telefono: '3000000000',
+    servicio,
+    fecha,
+    entrega: fecha,
+    total,
+    estado,
+  };
+}
+
+const fechaEsteMes = new Date().toISOString();
 
 describe('OrdersService', () => {
   beforeEach(() => {
     localStorage.clear();
+    reiniciarSupabaseFake();
   });
 
-  it('genera pedidos de demostración y una lista reciente corta', () => {
+  it('permanece vacío cuando la tabla no tiene filas', async () => {
     const servicio = crearServicio();
+    await servicio.cargar();
 
-    expect(servicio.pedidos().length).toBe(27);
-    expect(servicio.recientes().length).toBe(6);
+    expect(servicio.pedidos().length).toBe(0);
+    expect(servicio.recientes().length).toBe(0);
+    expect(servicio.cotizacionesPendientes()).toBe(0);
+  });
+
+  it('carga pedidos y deriva recientes, pendientes, clientes y servicios', async () => {
+    establecerFilas({
+      orders: [
+        filaPedido('1', 'entregado', fechaEsteMes, 100, 'Confección', 'a@ejemplo.com'),
+        filaPedido('2', 'pendiente', fechaEsteMes, 50, 'Arreglos', 'b@ejemplo.com'),
+      ],
+    });
+    const servicio = crearServicio();
+    await servicio.cargar();
+
+    expect(servicio.pedidos().length).toBe(2);
+    expect(servicio.recientes().length).toBe(2);
     expect(servicio.cotizacionesPendientes()).toBe(1);
+    expect(servicio.ingresosDelMes()).toBe(100);
+    expect(servicio.serviciosMasPedidos()[0].servicio).toBe('Confección');
+    expect(servicio.clientes().length).toBe(2);
   });
 
-  it('calcula las ventas de los últimos seis meses', () => {
+  it('devuelve seis meses en el resumen de ventas', () => {
     const servicio = crearServicio();
-    const ventas = servicio.ventasSeisMeses();
 
-    expect(ventas.length).toBe(6);
-    expect(ventas.every((mes) => mes.total > 0)).toBe(true);
-    expect(servicio.ingresosDelMes()).toBeGreaterThan(0);
+    expect(servicio.ventasSeisMeses().length).toBe(6);
   });
 
-  it('ordena los servicios más pedidos y calcula porcentajes', () => {
+  it('actualiza el estado y recalcula los pendientes', async () => {
+    establecerFilas({ orders: [filaPedido('1', 'pendiente', fechaEsteMes, 50, 'Arreglos', 'a@ejemplo.com')] });
     const servicio = crearServicio();
-    const servicios = servicio.serviciosMasPedidos();
+    await servicio.cargar();
 
-    expect(servicios.length).toBe(4);
-    expect(servicios[0].pedidos).toBeGreaterThanOrEqual(servicios[1].pedidos);
-    expect(servicios.every((servicio) => servicio.porcentaje > 0)).toBe(true);
-  });
-
-  it('deriva los clientes con su historial y total entregado', () => {
-    const servicio = crearServicio();
-    const clientes = servicio.clientes();
-
-    expect(clientes.length).toBeGreaterThan(10);
-    expect(clientes[0].totalGastado).toBeGreaterThan(0);
-    expect(clientes.every((cliente) => cliente.pedidos > 0)).toBe(true);
-  });
-
-  it('actualiza el estado de un pedido y recalcula pendientes', () => {
-    const servicio = crearServicio();
-    const pendiente = servicio.pedidos().find((pedido) => pedido.estado === 'pendiente');
-
-    expect(pendiente).toBeDefined();
-    if (!pendiente) return;
-
-    servicio.cambiarEstado(pendiente.id, 'entregado');
+    expect(await servicio.cambiarEstado('1', 'entregado')).toBe(true);
 
     expect(servicio.cotizacionesPendientes()).toBe(0);
-    expect(servicio.pedidos().find((pedido) => pedido.id === pendiente.id)?.estado).toBe('entregado');
+    expect(servicio.pedidos().find((pedido) => pedido.id === '1')?.estado).toBe('entregado');
+  });
+
+  it('convierte una solicitud en pedido y la relaciona', async () => {
+    establecerFilas({
+      solicitudes_cotizacion: [
+        {
+          id: 'sol-1',
+          nombre: 'Ana',
+          correo: 'ana@ejemplo.com',
+          telefono: '8090000000',
+          servicio: 'Ajuste',
+          tipo_solicitud: 'Cotización',
+          mensaje: 'Dobladillo',
+          estado: 'nueva',
+          created_at: fechaEsteMes,
+        },
+      ],
+    });
+    const servicio = crearServicio();
+
+    const pedido = await servicio.convertirSolicitud(
+      {
+        id: 'sol-1',
+        nombre: 'Ana',
+        correo: 'ana@ejemplo.com',
+        telefono: '8090000000',
+        servicio: 'Ajuste',
+        tipoSolicitud: 'Cotización',
+        mensaje: 'Dobladillo',
+        estado: 'nueva',
+        creadoEn: fechaEsteMes,
+      },
+      { total: 1500, entrega: '2026-12-01' },
+    );
+
+    expect(pedido).not.toBeNull();
+    expect(pedido?.solicitudId).toBe('sol-1');
+    expect(pedido?.estado).toBe('pendiente');
+    expect(pedido?.total).toBe(1500);
+
+    await servicio.cargar();
+    expect(servicio.pedidos().some((p) => p.solicitudId === 'sol-1')).toBe(true);
   });
 });

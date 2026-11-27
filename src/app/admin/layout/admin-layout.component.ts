@@ -30,6 +30,7 @@ export class AdminLayoutComponent {
     { ruta: '/admin/resumen', etiqueta: 'Resumen', icono: 'space_dashboard', exacto: true },
     { ruta: '/admin/productos', etiqueta: 'Productos', icono: 'checkroom' },
     { ruta: '/admin/pedidos', etiqueta: 'Pedidos', icono: 'receipt_long' },
+    { ruta: '/admin/solicitudes', etiqueta: 'Solicitudes', icono: 'mark_email_unread' },
     { ruta: '/admin/clientes', etiqueta: 'Clientes', icono: 'group' },
     { ruta: '/admin/configuracion', etiqueta: 'Configuración', icono: 'tune' },
   ];
