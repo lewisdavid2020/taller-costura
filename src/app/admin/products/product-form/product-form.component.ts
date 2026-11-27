@@ -84,7 +84,7 @@ export class ProductFormComponent {
       Validators.maxLength(600),
     ]),
     categoria: this.fb.nonNullable.control<CategoriaProducto | ''>('', [Validators.required]),
-    precio: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    precio: this.fb.nonNullable.control('', [Validators.required, Validators.pattern(/^\d+([.,]\d{1,2})?$/)]),
     estado: this.fb.nonNullable.control<EstadoProducto>('activo', [Validators.required]),
   });
 
@@ -101,7 +101,7 @@ export class ProductFormComponent {
         nombre: this.original.nombre,
         descripcion: this.original.descripcion,
         categoria: this.original.categoria,
-        precio: this.original.precio,
+        precio: String(this.original.precio),
         estado: this.original.estado,
       });
     }
@@ -155,6 +155,7 @@ export class ProductFormComponent {
   mensajePrecio(): string {
     if (!this.precio.touched || this.precio.valid) return '';
     if (this.precio.hasError('required')) return 'Escribe el precio del producto.';
+    if (this.precio.hasError('pattern')) return 'Escribe un precio válido, por ejemplo 150 o 150.50.';
     if (this.precio.hasError('min')) return 'El precio debe ser mayor que cero.';
     return 'Revisa este campo.';
   }
@@ -236,7 +237,7 @@ export class ProductFormComponent {
     this.procesandoFotos.set(false);
   }
 
-  guardar(): void {
+  async guardar(): Promise<void> {
     this.errorFormulario.set('');
 
     if (this.formulario.invalid) {
@@ -246,19 +247,29 @@ export class ProductFormComponent {
     }
 
     const valores = this.formulario.getRawValue();
+    const precioCrudo = String(valores.precio ?? '').replace(',', '.').trim();
+    const precio = Number.parseFloat(precioCrudo);
+
+    if (!Number.isFinite(precio) || precio <= 0) {
+      this.precio.setErrors({ ...(this.precio.errors ?? {}), min: true });
+      this.precio.markAsTouched();
+      this.errorFormulario.set('Revisa los campos marcados antes de guardar el producto.');
+      return;
+    }
+
     const datos = {
       nombre: valores.nombre.trim(),
       descripcion: valores.descripcion.trim(),
       categoria: valores.categoria as CategoriaProducto,
-      precio: Number(valores.precio),
+      precio,
       imagenes: this.imagenes(),
       estado: valores.estado,
     };
 
     if (this.esEdicion && this.id) {
-      const actualizado = this.catalogo.actualizar(this.id, datos);
+      const actualizado = await this.catalogo.actualizar(this.id, datos);
       if (!actualizado) {
-        this.errorFormulario.set('No encontramos este producto. Puede que se haya eliminado.');
+        this.errorFormulario.set('No pudimos actualizar el producto. Verifica la conexión con Supabase.');
         return;
       }
       this.toast.mostrar(`«${actualizado.nombre}» se actualizó correctamente.`);
@@ -266,7 +277,11 @@ export class ProductFormComponent {
       return;
     }
 
-    const creado = this.catalogo.crear(datos);
+    const creado = await this.catalogo.crear(datos);
+    if (!creado) {
+      this.errorFormulario.set('No pudimos guardar el producto. Verifica la conexión con Supabase.');
+      return;
+    }
     this.toast.mostrar(`«${creado.nombre}» se agregó al catálogo.`);
     void this.router.navigate(['/admin/productos']);
   }
@@ -275,10 +290,14 @@ export class ProductFormComponent {
     this.confirmar.abrir();
   }
 
-  eliminar(): void {
+  async eliminar(): Promise<void> {
     if (!this.id) return;
     const producto = this.original;
-    this.catalogo.eliminar(this.id);
+    const ok = await this.catalogo.eliminar(this.id);
+    if (!ok) {
+      this.toast.mostrar('No pudimos eliminar el producto. Inténtalo de nuevo.', 'error');
+      return;
+    }
     this.toast.mostrar(`«${producto?.nombre ?? 'El producto'}» se eliminó del catálogo.`);
     void this.router.navigate(['/admin/productos']);
   }

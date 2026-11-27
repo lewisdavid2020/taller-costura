@@ -4,3 +4,13 @@
 npm-debug.log*
 
 /.taste-skill
+/.opencode
+
+# Copia local de desarrollo (en GitHub la app vive en la raíz)
+/taller-costura/
+
+# Entornos y secretos
+.env
+.env.*
+*.local
+

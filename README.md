@@ -1,4 +1,4 @@
-# HILO & ESTILO
+# Taller de Costura
 
 Sitio web y panel de administración para un taller de costura y sastrería. La página pública presenta los servicios del taller y permite solicitar una cotización; el panel privado centraliza la operación diaria: productos, pedidos, clientes y configuración.
 
@@ -13,11 +13,10 @@ El acceso al panel está disponible desde el encabezado del sitio público. Cuan
 
 ## Sitio público
 
-- Portada con presentación del taller, indicadores del catálogo y acceso rápido a la cotización.
+- Presentación del taller y su propuesta de costura y sastrería.
 - Catálogo de servicios con descripción, precio de referencia, beneficios e iconografía propia.
-- Productos activos del panel integrados en el catálogo público.
-- Sección de proceso, presentación del taller y tarifas de referencia.
-- Formulario de contacto que prepara el mensaje de WhatsApp con los datos de la prenda.
+- Llamado a la acción para solicitar una cotización.
+- Sección de contacto y detalles del taller.
 - Navegación adaptada a celular, tableta y escritorio.
 - Botón de acceso al panel que reconoce si ya existe una sesión activa.
 
@@ -37,24 +36,67 @@ Dentro del panel, el botón Principal permite volver al sitio público sin cerra
 
 ## Diseño y experiencia
 
-La interfaz está completamente en español y sigue una estética editorial de costura artesanal: fondo papel cálido, tinta profunda, acentos terracota e hilo dorado, tipografía serif para los títulos y trazos limpios para los detalles de sastrería. La portada combina una ilustración de taller, tarjetas de servicios, productos del catálogo, proceso de trabajo, tarifas y formulario de contacto. La tipografía y los componentes mantienen una jerarquía clara en todas las pantallas.
+La interfaz está completamente en español y sigue una estética de costura profesional: tonos tinta, denim, tiza, cinta métrica e hilo, texturas inspiradas en tela y detalles de sastrería. La tipografía y los componentes mantienen una jerarquía clara en todas las pantallas.
 
 La adaptación móvil incluye menú lateral desplegable, barra superior compacta, navegación inferior, formularios en una sola columna y tablas convertidas en tarjetas para pedidos, clientes y productos. La sesión se conserva al moverse entre el sitio público y el panel.
 
 ## Tecnología
 
-- Angular 22 con componentes standalone y manejo de estado reactivo.
+- Angular 21 con componentes standalone y manejo de estado reactivo.
 - TypeScript para la lógica del sitio y del panel.
 - CSS propio para el sistema visual y los puntos de quiebre responsive.
 - Vitest para las pruebas automatizadas.
-- Almacenamiento local del navegador para la demostración de usuarios, productos, pedidos y configuración.
+- Supabase (PostgreSQL, Auth, Storage y RLS) para la base de datos, autenticación y almacenamiento de imágenes.
+
+## Backend con Supabase
+
+El proyecto ya incluye la integración con Supabase:
+
+- Cliente y configuración: `taller-costura/src/app/admin/core/supabase.client.ts` y `taller-costura/src/environments/`.
+- Migración SQL: `supabase/migrations/20261127000000_init.sql`.
+- Script en español para copiar/pegar en SQL Editor: `supabase/script_base_datos_taller_es.sql`.
+
+### Configuración rápida
+
+1. Configura las claves en:
+   - `taller-costura/src/environments/environment.ts`
+   - `taller-costura/src/environments/environment.development.ts`
+2. Coloca tu `supabaseUrl` y `supabaseAnonKey`.
+3. Ejecuta la migración SQL en Supabase si aún no está aplicada.
+4. Revisa en Supabase Auth la confirmación de correo según tu flujo de pruebas.
+
+### Conexión a la base de datos
+
+**Desde la app (frontend):** usa las variables de entorno de Supabase.
+
+```ts
+export const environment = {
+  production: false,
+  supabaseUrl: 'https://TU_PROJECT_REF.supabase.co',
+  supabaseAnonKey: 'TU_ANON_KEY',
+};
+```
+
+- `supabaseUrl`: la encuentras en Supabase Dashboard > Project Settings > Data API / General.
+- `supabaseAnonKey`: la encuentras en Supabase Dashboard > Project Settings > API Keys (clave pública/anon).
+
+**Conexión directa a PostgreSQL (opcional, para administración/migraciones):**
+
+```text
+Host: db.TU_PROJECT_REF.supabase.co
+Puerto: 5432
+Base de datos: postgres
+Usuario: postgres
+Contraseña: [la contraseña de base de datos del proyecto]
+SSL: requerido
+```
+
+> No publiques la `anon key` privada de servicio ni la contraseña de la base de datos en el repositorio.
 
 ## Estado actual
 
-Se trata de una demostración funcional. Los datos se guardan en el navegador del equipo donde se usa el panel, por lo que no se comparten todavía entre dispositivos ni usuarios. Las contraseñas se almacenan con hash y el registro requiere una invitación privada.
-
-El siguiente paso recomendado es conectar el panel a una base de datos real. La opción sugerida es Supabase con PostgreSQL, autenticación y almacenamiento de imágenes; PocketBase con SQLite es una alternativa sencilla para un taller pequeño con pocos administradores.
+El panel y el sitio ya están conectados a la estructura de Supabase. Para que la conexión funcione en tu entorno, debes configurar las claves de Supabase en los archivos de environment. Las imágenes de productos se suben a Supabase Storage cuando la configuración está activa.
 
 ## Verificación
 
-El proyecto compila correctamente para producción y cuenta con pruebas automatizadas que cubren el sitio público, el acceso, el registro, el panel, los productos, los pedidos, los clientes y la navegación responsive.
+El proyecto compila correctamente para producción y cuenta con pruebas automatizadas que cubren el sitio público, el acceso, el registro, el panel, los productos, los pedidos, los clientes y la navegación responsive.

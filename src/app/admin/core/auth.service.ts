@@ -1,10 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { supabase, supabaseConfigurado } from './supabase.client';
 import { Administrador, ResultadoAcceso } from './modelos';
-import { hashContrasena } from './contrasena';
-
-interface UsuarioGuardado extends Administrador {
-  hash: string;
-}
 
 interface RegistroAdministrador {
   nombre: string;
@@ -13,50 +9,72 @@ interface RegistroAdministrador {
   codigo: string;
 }
 
-const CLAVE_USUARIOS = 'taller.admin.usuarios.v1';
-const CLAVE_SESION = 'taller.admin.sesion.v1';
 const CODIGO_INVITACION = 'TALLER-2026';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly usuarios = signal<UsuarioGuardado[]>(this.leerUsuarios());
-  private readonly sesionActual = signal<Administrador | null>(this.leerSesion());
+  private readonly sesionActual = signal<Administrador | null>(null);
+  private readonly listoState = signal(false);
 
   readonly sesion = this.sesionActual.asReadonly();
   readonly autenticado = computed(() => this.sesionActual() !== null);
+  readonly listo = this.listoState.asReadonly();
+
+  constructor() {
+    void this.inicializar();
+  }
+
+  async inicializar(): Promise<void> {
+    if (!supabaseConfigurado) {
+      this.listoState.set(true);
+      return;
+    }
+
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.user) {
+      this.sesionActual.set(this.mapearUsuario(data.session.user));
+      void this.cargarPerfil(data.session.user.id, data.session.user.email ?? '');
+    }
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      if (!user) {
+        this.sesionActual.set(null);
+        return;
+      }
+      this.sesionActual.set(this.mapearUsuario(user));
+      void this.cargarPerfil(user.id, user.email ?? '');
+    });
+
+    this.listoState.set(true);
+  }
 
   async iniciarSesion(correo: string, contrasena: string): Promise<ResultadoAcceso> {
-    const correoNormalizado = correo.trim().toLowerCase();
-    const usuario = this.usuarios().find((u) => u.correo === correoNormalizado);
-
-    if (!usuario) {
-      return {
-        ok: false,
-        campo: 'correo',
-        error: 'No encontramos una cuenta con ese correo. Revisa que esté bien escrito.',
-      };
+    if (!supabaseConfigurado) {
+      return { ok: false, error: 'Supabase no está configurado. Agrega tu anon key en environments.' };
     }
 
-    const hash = await hashContrasena(contrasena);
-    if (hash !== usuario.hash) {
-      return {
-        ok: false,
-        campo: 'contrasena',
-        error: 'La contraseña no es correcta. Inténtalo de nuevo.',
-      };
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: correo.trim().toLowerCase(),
+      password: contrasena,
+    });
+
+    if (error) {
+      return this.mapearErrorAuth(error.message, 'login');
     }
 
-    const administrador: Administrador = {
-      id: usuario.id,
-      nombre: usuario.nombre,
-      correo: usuario.correo,
-      creadoEn: usuario.creadoEn,
-    };
-    this.guardarSesion(administrador);
+    if (data.user) {
+      this.sesionActual.set(this.mapearUsuario(data.user));
+      await this.cargarPerfil(data.user.id, data.user.email ?? correo);
+    }
     return { ok: true };
   }
 
   async registrar(datos: RegistroAdministrador): Promise<ResultadoAcceso> {
+    if (!supabaseConfigurado) {
+      return { ok: false, error: 'Supabase no está configurado. Agrega tu anon key en environments.' };
+    }
+
     if (datos.codigo.trim().toUpperCase() !== CODIGO_INVITACION) {
       return {
         ok: false,
@@ -65,111 +83,93 @@ export class AuthService {
       };
     }
 
-    const correoNormalizado = datos.correo.trim().toLowerCase();
-    if (this.usuarios().some((u) => u.correo === correoNormalizado)) {
+    const correo = datos.correo.trim().toLowerCase();
+    const nombre = datos.nombre.trim();
+    const { data, error } = await supabase.auth.signUp({
+      email: correo,
+      password: datos.contrasena,
+      options: {
+        data: { nombre },
+      },
+    });
+
+    if (error) {
+      return this.mapearErrorAuth(error.message, 'registro');
+    }
+
+    if (data.user) {
+      this.sesionActual.set({
+        id: data.user.id,
+        nombre,
+        correo,
+        creadoEn: data.user.created_at ?? new Date().toISOString(),
+      });
+      await this.cargarPerfil(data.user.id, correo);
+    }
+
+    return { ok: true };
+  }
+
+  async cerrarSesion(): Promise<void> {
+    if (supabaseConfigurado) {
+      await supabase.auth.signOut();
+    }
+    this.sesionActual.set(null);
+  }
+
+  private async cargarPerfil(userId: string, correoFallback: string): Promise<void> {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id,nombre,correo,created_at')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!data) return;
+    const actual = this.sesionActual();
+    if (!actual || actual.id !== userId) return;
+    this.sesionActual.set({
+      id: data.id,
+      nombre: data.nombre ?? actual.nombre,
+      correo: data.correo ?? correoFallback,
+      creadoEn: data.created_at ?? actual.creadoEn,
+    });
+  }
+
+  private mapearUsuario(user: { id: string; email?: string; created_at?: string; user_metadata?: Record<string, unknown> }): Administrador {
+    const metadata = user.user_metadata ?? {};
+    const nombre = typeof metadata['nombre'] === 'string' ? metadata['nombre'] : (user.email?.split('@')[0] ?? 'Administrador');
+    return {
+      id: user.id,
+      nombre,
+      correo: user.email ?? '',
+      creadoEn: user.created_at ?? new Date().toISOString(),
+    };
+  }
+
+  private mapearErrorAuth(mensaje: string, contexto: 'login' | 'registro'): ResultadoAcceso {
+    const texto = mensaje.toLowerCase();
+    if (texto.includes('invalid login credentials')) {
+      return {
+        ok: false,
+        campo: contexto === 'login' ? 'contrasena' : undefined,
+        error: contexto === 'login'
+          ? 'Correo o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.'
+          : 'No pudimos crear la cuenta con esos datos.',
+      };
+    }
+    if (texto.includes('already registered') || texto.includes('already been registered') || texto.includes('user already registered')) {
       return {
         ok: false,
         campo: 'correo',
         error: 'Ya existe una cuenta con este correo. Inicia sesión o usa otro correo.',
       };
     }
-
-    const administrador: Administrador = {
-      id: this.nuevoId(),
-      nombre: datos.nombre.trim(),
-      correo: correoNormalizado,
-      creadoEn: new Date().toISOString(),
-    };
-
-    const usuario: UsuarioGuardado = {
-      ...administrador,
-      hash: await hashContrasena(datos.contrasena),
-    };
-
-    this.usuarios.update((usuarios) => [...usuarios, usuario]);
-    this.persistirUsuarios();
-    this.guardarSesion(administrador);
-    return { ok: true };
-  }
-
-  cerrarSesion(): void {
-    this.sesionActual.set(null);
-    this.eliminar(CLAVE_SESION);
-  }
-
-  private guardarSesion(administrador: Administrador): void {
-    this.sesionActual.set(administrador);
-    this.escribir(CLAVE_SESION, JSON.stringify(administrador));
-  }
-
-  private persistirUsuarios(): void {
-    this.escribir(CLAVE_USUARIOS, JSON.stringify(this.usuarios()));
-  }
-
-  private leerUsuarios(): UsuarioGuardado[] {
-    const crudo = this.leer(CLAVE_USUARIOS);
-    if (!crudo) return [];
-    try {
-      const datos: unknown = JSON.parse(crudo);
-      if (!Array.isArray(datos)) return [];
-      return datos.filter(
-        (item): item is UsuarioGuardado =>
-          typeof item === 'object' &&
-          item !== null &&
-          typeof (item as UsuarioGuardado).id === 'string' &&
-          typeof (item as UsuarioGuardado).correo === 'string' &&
-          typeof (item as UsuarioGuardado).hash === 'string',
-      );
-    } catch {
-      return [];
+    if (texto.includes('password') && texto.includes('least')) {
+      return { ok: false, campo: 'contrasena', error: 'La contraseña no cumple los requisitos de seguridad.' };
     }
-  }
-
-  private leerSesion(): Administrador | null {
-    const crudo = this.leer(CLAVE_SESION);
-    if (!crudo) return null;
-    try {
-      const datos = JSON.parse(crudo) as Partial<Administrador>;
-      if (typeof datos.id === 'string' && typeof datos.nombre === 'string' && typeof datos.correo === 'string') {
-        return {
-          id: datos.id,
-          nombre: datos.nombre,
-          correo: datos.correo,
-          creadoEn: typeof datos.creadoEn === 'string' ? datos.creadoEn : new Date().toISOString(),
-        };
-      }
-      return null;
-    } catch {
-      return null;
+    if (texto.includes('email')) {
+      return { ok: false, campo: 'correo', error: 'El correo no tiene un formato válido o no se pudo usar.' };
     }
-  }
-
-  private nuevoId(): string {
-    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
-    return `adm-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  }
-
-  private leer(clave: string): string | null {
-    try {
-      return localStorage.getItem(clave);
-    } catch {
-      return null;
-    }
-  }
-
-  private escribir(clave: string, valor: string): void {
-    try {
-      localStorage.setItem(clave, valor);
-    } catch {
-      // El panel sigue funcionando en memoria si el navegador bloquea el almacenamiento.
-    }
-  }
-
-  private eliminar(clave: string): void {
-    try {
-      localStorage.removeItem(clave);
-    } catch {
-      // Sin almacenamiento disponible: la sesión solo vive en memoria.
-    }
+    return { ok: false, error: 'No pudimos completar la solicitud. Inténtalo de nuevo.' };
   }
 }

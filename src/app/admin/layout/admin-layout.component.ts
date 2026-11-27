@@ -38,8 +38,8 @@ export class AdminLayoutComponent {
     return iniciales(nombre);
   }
 
-  cerrarSesion(): void {
-    this.auth.cerrarSesion();
+  async cerrarSesion(): Promise<void> {
+    await this.auth.cerrarSesion();
     void this.router.navigate(['/admin/login'], { queryParams: { sesion: 'cerrada' } });
   }
 }

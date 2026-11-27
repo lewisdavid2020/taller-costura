@@ -103,11 +103,10 @@
                 <input
                   id="producto-precio"
                   class="adm-input"
-                  type="number"
+                  type="text"
                   formControlName="precio"
-                  min="0.01"
-                  step="0.01"
                   inputmode="decimal"
+                  autocomplete="off"
                   placeholder="0.00"
                   [attr.aria-invalid]="mensajePrecio() ? 'true' : null"
                   [attr.aria-describedby]="mensajePrecio() ? 'error-producto-precio' : null" />
@@ -123,6 +122,41 @@
       </section>
 
       <aside class="adm-form" aria-label="Fotos y visibilidad">
+        <section class="adm-card form-panel producto-preview" aria-labelledby="titulo-vista-previa">
+          <header class="form-panel__cabecera">
+            <h2 id="titulo-vista-previa">Vista previa</h2>
+            <p>Así se presentará la pieza en el catálogo.</p>
+          </header>
+          <div class="form-panel__cuerpo">
+            <div class="producto-preview__card">
+              <div class="producto-preview__media">
+                @if (imagenes().length > 0) {
+                  <img [src]="imagenes()[0]" [alt]="nombre.value || 'Vista previa del producto'" />
+                } @else {
+                  <div class="producto-preview__placeholder">
+                    <span class="material-symbols-outlined" aria-hidden="true">image</span>
+                    <span>Agrega una foto para ver la portada</span>
+                  </div>
+                }
+                <span class="producto-preview__estado" [class.producto-preview__estado--oculto]="!esActivo">
+                  {{ esActivo ? 'Activo' : 'Oculto' }}
+                </span>
+              </div>
+              <div class="producto-preview__body">
+                <p class="producto-preview__categoria">{{ categoria.value || 'Categoría' }}</p>
+                <h3 class="producto-preview__nombre">{{ nombre.value || 'Nombre del producto' }}</h3>
+                <p class="producto-preview__descripcion">
+                  {{ descripcion.value || 'La descripción del producto aparecerá aquí para darte una idea de cómo se verá en el catálogo.' }}
+                </p>
+                <div class="producto-preview__pie">
+                  <span class="producto-preview__precio">{{ precio.value ? ('$' + precio.value) : '$0.00' }}</span>
+                  <span class="producto-preview__fotos">{{ imagenes().length }} foto{{ imagenes().length === 1 ? '' : 's' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="adm-card form-panel" aria-labelledby="titulo-fotos-producto">
           <header class="form-panel__cabecera">
             <h2 id="titulo-fotos-producto">Fotos del producto</h2>

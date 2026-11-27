@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { CatalogService } from '../admin/core/catalog.service';
+import { WorkshopService } from '../admin/core/workshop.service';
 import { HeaderComponent } from '../header/header.component';
 import { HeroComponent } from '../hero/hero.component';
 import { ProductCardComponent } from '../product-card/product-card.component';
@@ -14,13 +15,20 @@ import { ContactComponent } from '../contact/contact.component';
 })
 export class LandingComponent {
   private readonly catalogo = inject(CatalogService);
+  private readonly taller = inject(WorkshopService);
 
   // Solo se muestran al público los productos marcados como activos en el panel.
   readonly productos = computed(() => this.catalogo.productos().filter((producto) => producto.estado === 'activo'));
+  readonly tallerDatos = this.taller.datos;
 
-  // Cambia aquí el nombre de tu negocio y tu WhatsApp (con código de país, sin + ni espacios).
-  nombreTaller = 'HILO & ESTILO';
-  whatsapp = '00000000000';
+  get nombreTaller(): string {
+    return this.tallerDatos().nombre;
+  }
+
+  get whatsapp(): string {
+    return this.tallerDatos().whatsapp;
+  }
+
   anio = new Date().getFullYear();
 
   // Datos de las 3 tarjetas de servicios.

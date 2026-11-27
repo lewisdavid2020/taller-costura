@@ -1698,33 +1698,192 @@
 
 /* Momento */
 .landing .momento-seccion {
-  display: flex;
-  min-height: calc(100svh - 76px);
-  align-items: center;
+  position: relative;
+  overflow: clip;
   border-block: 1px solid var(--line);
-  background: var(--soft);
+  background:
+    radial-gradient(ellipse 70% 60% at 0% 100%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, var(--soft) 92%, white) 0%, var(--soft) 100%);
+}
+
+.landing .momento-seccion::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.18;
+  pointer-events: none;
 }
 
 .landing .momento-wrap {
+  position: relative;
+  padding: 88px 0;
+}
+
+.landing .momento-grid {
   display: grid;
-  gap: 28px;
-  padding: 72px 0;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.landing .momento-intro {
+  display: grid;
+  gap: 24px;
+  align-content: start;
 }
 
 .landing .momento-texto {
-  max-width: 14ch;
+  max-width: 12ch;
+  margin: 0;
   color: var(--ink);
   font-family: "Fraunces", Georgia, serif;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  font-size: clamp(2rem, 3.8vw, 3.35rem);
   font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.08;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
 .landing .momento-resalte {
   color: var(--accent);
   font-style: italic;
+}
+
+.landing .momento-apoyo {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.landing .momento-sello {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.landing .momento-sello-linea {
+  width: 48px;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 10px);
+  flex-shrink: 0;
+}
+
+.landing .momento-sello-texto {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.landing .momento-pilares {
+  display: grid;
+  gap: 16px;
+}
+
+.landing .momento-pilar {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 24px 24px 24px 28px;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, white);
+  background: color-mix(in srgb, white 72%, var(--soft));
+  box-shadow: 0 1px 0 color-mix(in srgb, white 70%, transparent) inset;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.landing .momento-pilar::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 15%, transparent));
+  opacity: 0.55;
+  transition: opacity 220ms ease;
+}
+
+.landing .momento-pilar:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--line));
+  box-shadow: 0 14px 30px -20px rgba(35, 28, 20, 0.28);
+}
+
+.landing .momento-pilar:hover::before {
+  opacity: 1;
+}
+
+.landing .momento-pilar-num {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--accent) 80%, var(--muted));
+  letter-spacing: 0.04em;
+}
+
+.landing .momento-pilar-cuerpo {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.landing .momento-pilar-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 12px;
+  color: var(--accent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, white), color-mix(in srgb, var(--accent) 4%, white));
+  flex-shrink: 0;
+}
+
+.landing .momento-pilar-titulo {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.landing .momento-pilar-texto {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 980px) {
+  .landing .momento-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .landing .momento-texto {
+    max-width: 14ch;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing .momento-wrap {
+    padding: 64px 0;
+  }
+
+  .landing .momento-pilar {
+    padding: 20px 20px 20px 24px;
+  }
+
+  .landing .momento-pilar-cuerpo {
+    gap: 14px;
+  }
 }
 
 /* Entrada del hero */

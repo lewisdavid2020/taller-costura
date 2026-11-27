@@ -101,10 +101,14 @@ export class ProductsListComponent {
     this.confirmar.abrir();
   }
 
-  eliminar(): void {
+  async eliminar(): Promise<void> {
     const producto = this.productoAEliminar();
     if (!producto) return;
-    this.catalogo.eliminar(producto.id);
+    const ok = await this.catalogo.eliminar(producto.id);
+    if (!ok) {
+      this.toast.mostrar('No pudimos eliminar el producto. Inténtalo de nuevo.', 'error');
+      return;
+    }
     this.productoAEliminar.set(null);
     this.toast.mostrar(`«${producto.nombre}» se eliminó del catálogo.`);
     if (this.pagina() > this.totalPaginas()) this.pagina.set(this.totalPaginas());

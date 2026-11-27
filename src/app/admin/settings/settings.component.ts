@@ -28,6 +28,7 @@ export class SettingsComponent {
       [Validators.required, Validators.pattern(/^[0-9+\s()-]{7,20}$/)],
     ],
     correo: [this.taller.datos().correo, [Validators.required, Validators.email]],
+    direccion: [this.taller.datos().direccion, [Validators.required, Validators.minLength(5)]],
     horario: [this.taller.datos().horario, [Validators.required, Validators.minLength(5)]],
   });
 
@@ -41,6 +42,10 @@ export class SettingsComponent {
 
   get correo() {
     return this.formulario.controls.correo;
+  }
+
+  get direccion() {
+    return this.formulario.controls.direccion;
   }
 
   get horario() {
@@ -72,6 +77,13 @@ export class SettingsComponent {
     return 'Revisa este campo.';
   }
 
+  mensajeDireccion(): string {
+    if (!this.direccion.touched || this.direccion.valid) return '';
+    if (this.direccion.hasError('required')) return 'Escribe la dirección del taller.';
+    if (this.direccion.hasError('minlength')) return 'La dirección debe tener al menos 5 caracteres.';
+    return 'Revisa este campo.';
+  }
+
   mensajeHorario(): string {
     if (!this.horario.touched || this.horario.valid) return '';
     if (this.horario.hasError('required')) return 'Escribe el horario de atención.';
@@ -79,7 +91,7 @@ export class SettingsComponent {
     return 'Revisa este campo.';
   }
 
-  guardar(): void {
+  async guardar(): Promise<void> {
     this.errorFormulario.set('');
 
     if (this.formulario.invalid) {
@@ -88,7 +100,12 @@ export class SettingsComponent {
       return;
     }
 
-    this.taller.guardar(this.formulario.getRawValue());
+    const ok = await this.taller.guardar(this.formulario.getRawValue());
+    if (!ok) {
+      this.errorFormulario.set('No pudimos guardar la configuración. Verifica la conexión con Supabase.');
+      return;
+    }
+
     this.formulario.markAsPristine();
     this.toast.mostrar('La configuración del taller se guardó correctamente.');
   }

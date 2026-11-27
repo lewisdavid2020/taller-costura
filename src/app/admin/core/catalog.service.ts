@@ -1,195 +1,151 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { fechaHaceDias } from './formato';
-import { Producto } from './modelos';
+import { supabase, supabaseConfigurado } from './supabase.client';
+import { CategoriaProducto, EstadoProducto, Producto } from './modelos';
 
-const CLAVE_PRODUCTOS = 'taller.admin.productos.v1';
-
-function productosIniciales(): Producto[] {
-  return [
-    {
-      id: 'prod-vestido-lino',
-      nombre: 'Vestido de lino a medida',
-      descripcion:
-        'Vestido midi confeccionado en lino lavado, con pinzas ajustadas al cuerpo y acabados a mano. Incluye una prueba de calce.',
-      categoria: 'Confección',
-      precio: 1450,
-      imagenes: ['/img/producto-vestido.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(18),
-    },
-    {
-      id: 'prod-camisa-popelina',
-      nombre: 'Camisa de popelina',
-      descripcion:
-        'Camisa clásica de popelina con cuello italiano, canesú interior y botones de nácar. Disponible en blanco y azul denim.',
-      categoria: 'Confección',
-      precio: 680,
-      imagenes: ['/img/producto-camisa.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(26),
-    },
-    {
-      id: 'prod-ajuste-pantalon',
-      nombre: 'Ajuste de pantalón',
-      descripcion:
-        'Entalle de cintura, bastas y largo de pierna. Trabajamos sobre cualquier tipo de tela conservando la caída original.',
-      categoria: 'Arreglos',
-      precio: 180,
-      imagenes: ['/img/producto-pantalon.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(34),
-    },
-    {
-      id: 'prod-blazer-uniforme',
-      nombre: 'Blazer para uniforme escolar',
-      descripcion:
-        'Blazer institucional en gabardina resistente, con forro transpirable, escudo bordado y tallas consistentes por lote.',
-      categoria: 'Uniformes',
-      precio: 950,
-      imagenes: ['/img/producto-uniforme.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(41),
-    },
-    {
-      id: 'prod-bordado-iniciales',
-      nombre: 'Bordado de iniciales',
-      descripcion:
-        'Monograma bordado a mano o a máquina sobre pañuelos, camisas y toallas. Elige tipografía, hilo y ubicación.',
-      categoria: 'Bordados',
-      precio: 220,
-      imagenes: ['/img/producto-bordado.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(52),
-    },
-    {
-      id: 'prod-neceser-lino',
-      nombre: 'Neceser de lino',
-      descripcion:
-        'Neceser forrado con cierre de metal y asa de cinta. Ideal para guardar tijeras, carretes e hilos en el taller.',
-      categoria: 'Accesorios',
-      precio: 320,
-      imagenes: ['/img/producto-accesorio.svg'],
-      estado: 'oculto',
-      creadoEn: fechaHaceDias(63),
-    },
-    {
-      id: 'prod-falda-plisada',
-      nombre: 'Falda plisada',
-      descripcion:
-        'Falda de pliegues encontrados en crepé ligero, con cintura limpia y forro interior. Largo personalizable.',
-      categoria: 'Confección',
-      precio: 890,
-      imagenes: ['/img/producto-vestido.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(70),
-    },
-    {
-      id: 'prod-delantal-taller',
-      nombre: 'Delantal de taller',
-      descripcion:
-        'Delantal de mezclilla con bolsillos reforzados, presillas para herramientas y correa ajustable. Personalizable con bordado.',
-      categoria: 'Uniformes',
-      precio: 410,
-      imagenes: ['/img/producto-uniforme.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(81),
-    },
-    {
-      id: 'prod-cambio-cierre',
-      nombre: 'Cambio de cierre',
-      descripcion:
-        'Sustitución de cierres en chamarras, pantalones y bolsos. Incluye costura reforzada y prueba de deslizamiento.',
-      categoria: 'Arreglos',
-      precio: 150,
-      imagenes: ['/img/producto-pantalon.svg'],
-      estado: 'activo',
-      creadoEn: fechaHaceDias(92),
-    },
-    {
-      id: 'prod-kit-costura',
-      nombre: 'Kit de costura artesanal',
-      descripcion:
-        'Estuche de tela con tijeras, agujas, alfileres y tres carretes de hilo. Una pieza útil y bien terminada para regalar.',
-      categoria: 'Accesorios',
-      precio: 260,
-      imagenes: ['/img/producto-accesorio.svg'],
-      estado: 'oculto',
-      creadoEn: fechaHaceDias(104),
-    },
-  ];
+interface ProductoFila {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  categoria: CategoriaProducto;
+  precio: number | string;
+  imagenes: string[] | null;
+  estado: EstadoProducto;
+  created_at: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
-  private readonly productosState = signal<Producto[]>(this.leerProductos());
+  private readonly productosState = signal<Producto[]>([]);
+  private readonly cargandoState = signal(false);
 
   readonly productos = this.productosState.asReadonly();
+  readonly cargando = this.cargandoState.asReadonly();
   readonly total = computed(() => this.productosState().length);
   readonly activos = computed(() => this.productosState().filter((p) => p.estado === 'activo').length);
   readonly ocultos = computed(() => this.productosState().filter((p) => p.estado === 'oculto').length);
+
+  constructor() {
+    void this.cargar();
+  }
+
+  async cargar(): Promise<void> {
+    if (!supabaseConfigurado) return;
+    this.cargandoState.set(true);
+    const { data, error } = await supabase
+      .from('products')
+      .select('id,nombre,descripcion,categoria,precio,imagenes,estado,created_at')
+      .order('created_at', { ascending: false });
+
+    this.cargandoState.set(false);
+    if (error || !data) return;
+    this.productosState.set(data.map((fila) => this.mapearProducto(fila as ProductoFila)));
+  }
 
   obtener(id: string): Producto | undefined {
     return this.productosState().find((p) => p.id === id);
   }
 
-  crear(datos: Omit<Producto, 'id' | 'creadoEn'>): Producto {
-    const producto: Producto = {
-      ...datos,
-      id: this.nuevoId(),
-      creadoEn: new Date().toISOString(),
-    };
-    this.productosState.update((productos) => [producto, ...productos]);
-    this.persistir();
+  async crear(datos: Omit<Producto, 'id' | 'creadoEn'>): Promise<Producto | null> {
+    if (!supabaseConfigurado) return null;
+    const imagenes = await this.prepararImagenes(datos.imagenes);
+    const { data, error } = await supabase
+      .from('products')
+      .insert({
+        nombre: datos.nombre.trim(),
+        descripcion: datos.descripcion.trim(),
+        categoria: datos.categoria,
+        precio: datos.precio,
+        imagenes,
+        estado: datos.estado,
+      })
+      .select('id,nombre,descripcion,categoria,precio,imagenes,estado,created_at')
+      .single();
+
+    if (error || !data) return null;
+    const producto = this.mapearProducto(data as ProductoFila);
+    this.productosState.update((productos) => [producto, ...productos.filter((p) => p.id !== producto.id)]);
     return producto;
   }
 
-  actualizar(id: string, datos: Omit<Producto, 'id' | 'creadoEn'>): Producto | null {
-    const actual = this.obtener(id);
-    if (!actual) return null;
-    const actualizado: Producto = { ...actual, ...datos };
-    this.productosState.update((productos) => productos.map((p) => (p.id === id ? actualizado : p)));
-    this.persistir();
-    return actualizado;
+  async actualizar(id: string, datos: Omit<Producto, 'id' | 'creadoEn'>): Promise<Producto | null> {
+    if (!supabaseConfigurado) return null;
+    const imagenes = await this.prepararImagenes(datos.imagenes);
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        nombre: datos.nombre.trim(),
+        descripcion: datos.descripcion.trim(),
+        categoria: datos.categoria,
+        precio: datos.precio,
+        imagenes,
+        estado: datos.estado,
+      })
+      .eq('id', id)
+      .select('id,nombre,descripcion,categoria,precio,imagenes,estado,created_at')
+      .single();
+
+    if (error || !data) return null;
+    const producto = this.mapearProducto(data as ProductoFila);
+    this.productosState.update((productos) => productos.map((p) => (p.id === id ? producto : p)));
+    return producto;
   }
 
-  eliminar(id: string): boolean {
-    const existe = this.productosState().some((p) => p.id === id);
-    if (!existe) return false;
+  async eliminar(id: string): Promise<boolean> {
+    if (!supabaseConfigurado) return false;
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) return false;
     this.productosState.update((productos) => productos.filter((p) => p.id !== id));
-    this.persistir();
     return true;
   }
 
-  private persistir(): void {
-    try {
-      localStorage.setItem(CLAVE_PRODUCTOS, JSON.stringify(this.productosState()));
-    } catch {
-      // Si el almacenamiento está lleno, los cambios se conservan en memoria.
+  private async prepararImagenes(imagenes: string[]): Promise<string[]> {
+    const resultado: string[] = [];
+    for (let i = 0; i < imagenes.length; i++) {
+      const imagen = imagenes[i];
+      if (!imagen.startsWith('data:')) {
+        resultado.push(imagen);
+        continue;
+      }
+      const url = await this.subirImagen(imagen, i);
+      resultado.push(url ?? imagen);
     }
+    return resultado;
   }
 
-  private leerProductos(): Producto[] {
-    try {
-      const crudo = localStorage.getItem(CLAVE_PRODUCTOS);
-      if (crudo === null) return productosIniciales();
-      const datos: unknown = JSON.parse(crudo);
-      if (!Array.isArray(datos)) return productosIniciales();
-      return datos.filter(
-        (item): item is Producto =>
-          typeof item === 'object' &&
-          item !== null &&
-          typeof (item as Producto).id === 'string' &&
-          typeof (item as Producto).nombre === 'string' &&
-          typeof (item as Producto).precio === 'number' &&
-          Array.isArray((item as Producto).imagenes),
-      );
-    } catch {
-      return productosIniciales();
-    }
+  private async subirImagen(dataUrl: string, indice: number): Promise<string | null> {
+    const archivo = this.dataUrlAArchivo(dataUrl, indice);
+    if (!archivo) return null;
+    const ruta = `productos/${Date.now()}-${indice}-${Math.random().toString(36).slice(2, 10)}.${archivo.ext}`;
+    const { error } = await supabase.storage.from('product-images').upload(ruta, archivo.blob, {
+      contentType: archivo.mime,
+      upsert: false,
+    });
+    if (error) return null;
+    const { data } = supabase.storage.from('product-images').getPublicUrl(ruta);
+    return data.publicUrl;
   }
 
-  private nuevoId(): string {
-    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
-    return `prod-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  private dataUrlAArchivo(dataUrl: string, indice: number): { blob: Blob; mime: string; ext: string } | null {
+    const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+    if (!match) return null;
+    const mime = match[1];
+    const binario = atob(match[2]);
+    const bytes = new Uint8Array(binario.length);
+    for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
+    const ext = mime.split('/')[1]?.replace('jpeg', 'jpg').replace('svg+xml', 'svg') || 'jpg';
+    return { blob: new Blob([bytes], { type: mime }), mime, ext };
+  }
+
+  private mapearProducto(fila: ProductoFila): Producto {
+    return {
+      id: fila.id,
+      nombre: fila.nombre,
+      descripcion: fila.descripcion,
+      categoria: fila.categoria,
+      precio: Number(fila.precio),
+      imagenes: Array.isArray(fila.imagenes) ? fila.imagenes : [],
+      estado: fila.estado,
+      creadoEn: fila.created_at,
+    };
   }
 }

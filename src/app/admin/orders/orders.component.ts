@@ -38,10 +38,16 @@ export class OrdersComponent {
     return ETIQUETA_ESTADO[estado];
   }
 
-  cambiarEstado(pedido: Pedido, evento: Event): void {
-    const estado = (evento.target as HTMLSelectElement).value as EstadoPedido;
+  async cambiarEstado(pedido: Pedido, evento: Event): Promise<void> {
+    const select = evento.target as HTMLSelectElement;
+    const estado = select.value as EstadoPedido;
     if (estado === pedido.estado) return;
-    this.servicio.cambiarEstado(pedido.id, estado);
+    const ok = await this.servicio.cambiarEstado(pedido.id, estado);
+    if (!ok) {
+      select.value = pedido.estado;
+      this.toast.mostrar('No pudimos actualizar el estado del pedido.', 'error');
+      return;
+    }
     this.toast.mostrar(`El pedido ${pedido.folio} ahora está ${ETIQUETA_ESTADO[estado].toLowerCase()}.`);
   }
 
