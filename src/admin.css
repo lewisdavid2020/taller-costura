@@ -4,24 +4,24 @@
    ========================================================================== */
 
 :root {
-  --adm-tinta: #16213a;
-  --adm-denim: #27406b;
-  --adm-tiza: #f4f6f8;
-  --adm-cinta: #f0c64a;
-  --adm-hilo: #c4352b;
-  --adm-blanco: #ffffff;
-  --adm-tinta-suave: #33415c;
-  --adm-gris: #64708a;
-  --adm-gris-oscuro: #46536a;
-  --adm-linea: #dde3eb;
-  --adm-linea-fuerte: #c5cedb;
-  --adm-verde: #2f6b52;
-  --adm-sombra: 0 18px 48px rgb(22 33 58 / 8%);
-  --adm-sombra-suave: 0 1px 2px rgb(22 33 58 / 7%);
-  --adm-fuente-titulos: 'Libre Baskerville', Georgia, serif;
-  --adm-fuente-texto: 'Lato', system-ui, sans-serif;
-  --adm-fuente-datos: 'Red Hat Mono', 'Courier New', monospace;
-  --adm-radio: 4px;
+  --adm-tinta: #1f2a37;
+  --adm-denim: #3a4553;
+  --adm-tiza: #f6efe4;
+  --adm-cinta: #d9a441;
+  --adm-hilo: #b4532a;
+  --adm-blanco: #fffaf2;
+  --adm-tinta-suave: #4b5563;
+  --adm-gris: #6b7280;
+  --adm-gris-oscuro: #5b6470;
+  --adm-linea: #e3d6c3;
+  --adm-linea-fuerte: #d3c2a9;
+  --adm-verde: #5f7a57;
+  --adm-sombra: 0 18px 48px rgb(31 42 55 / 8%);
+  --adm-sombra-suave: 0 1px 2px rgb(31 42 55 / 6%);
+  --adm-fuente-titulos: "Fraunces", Georgia, serif;
+  --adm-fuente-texto: "Geist", system-ui, -apple-system, sans-serif;
+  --adm-fuente-datos: "Red Hat Mono", "Courier New", monospace;
+  --adm-radio: 12px;
 }
 
 .adm-app,

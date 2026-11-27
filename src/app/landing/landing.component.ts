@@ -11,7 +11,6 @@ import { ContactComponent } from '../contact/contact.component';
   standalone: true,
   imports: [HeaderComponent, HeroComponent, ProductCardComponent, ServiceCardComponent, ContactComponent],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css',
 })
 export class LandingComponent {
   private readonly catalogo = inject(CatalogService);
@@ -24,7 +23,7 @@ export class LandingComponent {
   whatsapp = '00000000000';
   anio = new Date().getFullYear();
 
-  // Datos de las 3 tarjetas. Se muestran todas con el mismo componente ServiceCard.
+  // Datos de las 3 tarjetas de servicios.
   servicios = [
     {
       titulo: 'Arreglos y ajustes',

@@ -1,34 +1,34 @@
-<header class="encabezado">
-  <div class="container barra">
-    <a class="marca" href="#inicio" aria-label="{{ nombre }}, volver al inicio" (click)="cerrarMenu()">
-      <span class="marca-icono" aria-hidden="true">
-        <span class="material-symbols-outlined">straighten</span>
+<header class="site-header">
+  <nav class="wrap nav" aria-label="Navegación principal">
+    <a class="logo" href="#inicio" [attr.aria-label]="nombre + ', volver al inicio'" (click)="cerrarMenu()">
+      <span class="logo-nombre">
+        @if (partesNombre.length > 1) {
+          {{ partesNombre[0] }} <span class="amp">&amp;</span> {{ partesNombre[1] }}
+        } @else {
+          {{ nombre }}
+        }
       </span>
-      <span class="marca-texto">
-        <strong>{{ nombre }}</strong>
-        <small>COSTURA &amp; SASTRERÍA</small>
-      </span>
+      <span class="logo-lema">Sastrería a medida</span>
     </a>
 
-    <nav id="menu-principal" class="menu" [class.abierto]="menuAbierto">
-      <a href="#servicios" (click)="cerrarMenu()">Servicios</a>
-      <a href="#productos" (click)="cerrarMenu()">Productos</a>
-      <a href="#contacto" (click)="cerrarMenu()">Contacto</a>
-      <a class="menu-cta" href="#contacto" (click)="cerrarMenu()">Cotizar ahora <span aria-hidden="true">↗</span></a>
-    </nav>
+    <ul id="menu-principal" class="links" [class.abierto]="menuAbierto">
+      <li><a href="#servicios" (click)="cerrarMenu()">Servicios</a></li>
+      <li><a href="#productos" (click)="cerrarMenu()">Productos</a></li>
+      <li><a href="#proceso" (click)="cerrarMenu()">Proceso</a></li>
+      <li><a href="#taller" (click)="cerrarMenu()">El taller</a></li>
+      <li><a href="#tarifas" (click)="cerrarMenu()">Tarifas</a></li>
+      <li><a href="#contacto" (click)="cerrarMenu()">Contacto</a></li>
+    </ul>
 
-    <div class="barra-acciones">
+    <div class="nav-acciones">
       <a
-        class="acceso"
+        class="btn ghost sm acceso"
         [routerLink]="rutaAcceso()"
         [attr.aria-label]="etiquetaAcceso() + ' del taller'"
-        (click)="cerrarMenu()">
-        <span class="material-symbols-outlined" aria-hidden="true">{{ iconoAcceso() }}</span>
-        <span class="acceso-texto">{{ etiquetaAcceso() }}</span>
-      </a>
+        (click)="cerrarMenu()">{{ etiquetaAcceso() }}</a>
 
       <button
-        class="boton-menu"
+        class="menu-btn"
         type="button"
         aria-controls="menu-principal"
         [attr.aria-expanded]="menuAbierto"
@@ -37,6 +37,5 @@
         <span></span><span></span><span></span>
       </button>
     </div>
-  </div>
-  <div class="tape" aria-hidden="true"></div>
+  </nav>
 </header>

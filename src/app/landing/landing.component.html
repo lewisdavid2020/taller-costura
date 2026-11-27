@@ -1,44 +1,72 @@
-<app-header [nombre]="nombreTaller" />
+<div class="landing">
+  <app-header [nombre]="nombreTaller" />
 
-<main>
-  <app-hero [nombre]="nombreTaller" />
+  <main>
+    <div class="wrap">
+      <app-hero
+        [nombre]="nombreTaller"
+        [totalServicios]="servicios.length"
+        [totalProductos]="productos().length" />
+    </div>
 
-  <div class="tape tape-divisor" role="separator" aria-label="Divisor con marcas de cinta métrica"></div>
-
-  <section id="servicios" class="servicios">
-    <div class="container">
-      <div class="encabezado-seccion">
-        <div class="encabezado-seccion__titulo">
-          <p class="catalogo"><span class="material-symbols-outlined" aria-hidden="true">sell</span>Catálogo artesanal</p>
-          <h2>Nuestros servicios</h2>
+    <div class="cinta" aria-label="Especialidades del taller">
+      <div class="wrap">
+        <div class="cinta-fila" aria-hidden="true">
+          <span>Arreglos</span>
+          <span>Confección</span>
+          <span>Uniformes</span>
+          <span>Bordados</span>
+          <span>Composturas</span>
         </div>
-        <p class="intro">Cuidamos cada puntada para conservar la forma, la caída y la durabilidad de tus prendas favoritas.</p>
       </div>
+    </div>
 
-      <div class="rejilla">
-        @for (s of servicios; track s.titulo; let indice = $index) {
-          <app-service-card
-            [titulo]="s.titulo"
-            [descripcion]="s.descripcion"
-            [precio]="s.precio"
-            [etiqueta]="s.etiqueta"
-            [icono]="s.icono"
-            [beneficios]="s.beneficios"
-            [numero]="indice + 1" />
-        }
+    <section id="servicios">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-titulo">
+            <p class="eyebrow">Catálogo artesanal</p>
+            <h2 class="serif">Servicios pensados para tus prendas</h2>
+          </div>
+          <div class="sec-lado">
+            <p class="sec-intro">
+              Cuidamos cada puntada para conservar la forma, la caída y la durabilidad de tus prendas favoritas.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid">
+          @for (s of servicios; track s.titulo; let indice = $index) {
+            <app-service-card
+              [titulo]="s.titulo"
+              [descripcion]="s.descripcion"
+              [precio]="s.precio"
+              [etiqueta]="s.etiqueta"
+              [icono]="s.icono"
+              [beneficios]="s.beneficios"
+              [numero]="indice + 1" />
+          }
+        </div>
       </div>
+    </section>
 
-      @if (productos().length > 0) {
-        <div id="productos" class="productos-taller">
-          <div class="encabezado-seccion encabezado-seccion--productos">
-            <div class="encabezado-seccion__titulo">
-              <p class="catalogo"><span class="material-symbols-outlined" aria-hidden="true">checkroom</span>Piezas del taller</p>
-              <h2>Productos del taller</h2>
+    @if (productos().length > 0) {
+      <section id="productos" class="seccion-superficie">
+        <div class="wrap">
+          <div class="sec-head">
+            <div class="sec-titulo">
+              <p class="eyebrow">Piezas del taller</p>
+              <h2 class="serif">Productos del taller</h2>
             </div>
-            <p class="intro">Prendas y piezas confeccionadas por nosotros. Consulta cada modelo y solicita su cotización.</p>
+            <div class="sec-lado">
+              <span class="contador">{{ productos().length }} {{ productos().length === 1 ? 'pieza disponible' : 'piezas disponibles' }}</span>
+              <p class="sec-intro">
+                Prendas y piezas confeccionadas por nosotros. Consulta cada modelo y solicita su cotización.
+              </p>
+            </div>
           </div>
 
-          <div class="rejilla-productos">
+          <div class="grid-productos">
             @for (producto of productos(); track producto.id; let indice = $index) {
               <app-product-card
                 [nombre]="producto.nombre"
@@ -50,26 +78,187 @@
             }
           </div>
         </div>
-      }
+      </section>
+    }
+
+    <section id="proceso" class="process">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-titulo">
+            <p class="eyebrow">Cómo trabajamos</p>
+            <h2 class="serif">De la idea a la prenda.</h2>
+          </div>
+          <div class="sec-lado">
+            <p class="sec-intro">
+              Un proceso simple, con comunicación directa y el cuidado puesto en cada detalle.
+            </p>
+          </div>
+        </div>
+
+        <ol class="steps">
+          <li>
+            <h3>Cuéntanos</h3>
+            <p>Dinos qué prenda quieres arreglar o confeccionar y para cuándo la necesitas.</p>
+          </li>
+          <li>
+            <h3>Cotizamos</h3>
+            <p>Te respondemos por WhatsApp con el costo estimado y la disponibilidad.</p>
+          </li>
+          <li>
+            <h3>Ajustamos</h3>
+            <p>Tomamos medidas, probamos el calce y trabajamos la prenda con calma.</p>
+          </li>
+          <li>
+            <h3>Entregamos</h3>
+            <p>Revisamos los acabados contigo y te devolvemos la prenda lista para usar.</p>
+          </li>
+        </ol>
+
+        <div class="process-cta">
+          <p>¿Tienes una prenda en mente?</p>
+          <a class="btn claro" href="#contacto">Pedir cotización</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="taller">
+      <div class="wrap about">
+        <div class="about-figura">
+          <img src="/img/producto-bordado.svg" alt="Detalle de un bordado hecho a mano en el taller" loading="lazy" />
+          <div class="about-sello">
+            <b>Atención cercana</b>
+            <span>Hecho en nuestro taller</span>
+          </div>
+        </div>
+
+        <div class="about-texto">
+          <p class="eyebrow">El taller</p>
+          <h2 class="serif">Un taller pequeño, con tiempo para los detalles.</h2>
+          <p>
+            Trabajamos de forma artesanal y personalizada. Cada prenda pasa por nuestras manos,
+            sin apuros y con la atención que merece.
+          </p>
+          <p>
+            Nos gusta escuchar lo que necesitas, respetar el estilo de cada persona y entregar
+            un trabajo que se sienta cómodo desde la primera prueba.
+          </p>
+
+          <ul class="feats">
+            <li>
+              <span class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span>
+                <strong>Toma de medidas personalizada</strong>
+                <span class="feat-texto">Cada prenda parte de tus medidas reales, no de una talla estándar.</span>
+              </span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span>
+                <strong>Prueba de calce</strong>
+                <span class="feat-texto">Revisamos el ajuste antes de terminar para que te quede cómoda.</span>
+              </span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span>
+                <strong>Acabados a mano</strong>
+                <span class="feat-texto">Bastas, botones y remates revisados uno por uno.</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="tarifas" class="seccion-superficie">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-titulo">
+            <p class="eyebrow">Precios de referencia</p>
+            <h2 class="serif">Tarifas claras, sin sorpresas.</h2>
+          </div>
+          <div class="sec-lado">
+            <p class="sec-intro">
+              Cada trabajo se cotiza según la prenda y el acabado. La cotización es sin compromiso.
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="rates">
+            <thead>
+              <tr>
+                <th>Servicio</th>
+                <th>Qué incluye</th>
+                <th>Desde</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of servicios; track s.titulo) {
+                <tr>
+                  <td>{{ s.titulo }}</td>
+                  <td>{{ s.descripcion }}</td>
+                  <td>{{ s.precio }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tarifas-pie">
+          <p class="note">
+            Los precios son referenciales. El costo final depende del tipo de tela, el acabado y el estado de la prenda.
+          </p>
+          <a class="btn ghost sm" href="#contacto">Solicitar cotización</a>
+        </div>
+      </div>
+    </section>
+
+    <app-contact
+      [nombreTaller]="nombreTaller"
+      [whatsapp]="whatsapp"
+      [servicios]="titulosServicios" />
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <div class="footer-fila">
+        <div class="footer-marca">
+          <a class="footer-logo" href="#inicio">
+            @if (nombreTaller.includes('&')) {
+              {{ nombreTaller.split('&')[0].trim() }} <span>&amp;</span> {{ nombreTaller.split('&')[1].trim() }}
+            } @else {
+              {{ nombreTaller }}
+            }
+          </a>
+          <p>Sastrería y costura a medida.</p>
+        </div>
+
+        <nav aria-label="Enlaces del pie de página">
+          <a href="#servicios">Servicios</a>
+          <a href="#productos">Productos</a>
+          <a href="#proceso">Proceso</a>
+          <a href="#tarifas">Tarifas</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+      </div>
+
+      <div class="footer-base">
+        <p>© {{ anio }} {{ nombreTaller }}. Todos los derechos reservados.</p>
+        <p>Hecho con calma, puntada a puntada.</p>
+      </div>
     </div>
-  </section>
-
-  <app-contact
-    [nombreTaller]="nombreTaller"
-    [whatsapp]="whatsapp"
-    [servicios]="titulosServicios" />
-</main>
-
-<footer class="pie">
-  <div class="tape" aria-hidden="true"></div>
-  <div class="container pie-contenido">
-    <a class="pie-marca" href="#inicio">
-      <span class="material-symbols-outlined" aria-hidden="true">straighten</span>
-      <span>{{ nombreTaller }}<small>Costura a tu medida</small></span>
-    </a>
-    <p>© {{ anio }} {{ nombreTaller }}. Todos los derechos reservados.</p>
-    <nav aria-label="Enlaces del pie de página">
-      <a href="#servicios">Servicios</a><span aria-hidden="true">•</span><a href="#productos">Productos</a><span aria-hidden="true">•</span><a href="#contacto">Contacto</a>
-    </nav>
-  </div>
-</footer>
+  </footer>
+</div>

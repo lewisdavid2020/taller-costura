@@ -13,10 +13,11 @@ El acceso al panel está disponible desde el encabezado del sitio público. Cuan
 
 ## Sitio público
 
-- Presentación del taller y su propuesta de costura y sastrería.
+- Portada con presentación del taller, indicadores del catálogo y acceso rápido a la cotización.
 - Catálogo de servicios con descripción, precio de referencia, beneficios e iconografía propia.
-- Llamado a la acción para solicitar una cotización.
-- Sección de contacto y detalles del taller.
+- Productos activos del panel integrados en el catálogo público.
+- Sección de proceso, presentación del taller y tarifas de referencia.
+- Formulario de contacto que prepara el mensaje de WhatsApp con los datos de la prenda.
 - Navegación adaptada a celular, tableta y escritorio.
 - Botón de acceso al panel que reconoce si ya existe una sesión activa.
 
@@ -36,7 +37,7 @@ Dentro del panel, el botón Principal permite volver al sitio público sin cerra
 
 ## Diseño y experiencia
 
-La interfaz está completamente en español y sigue una estética de costura profesional: tonos tinta, denim, tiza, cinta métrica e hilo, texturas inspiradas en tela y detalles de sastrería. La tipografía y los componentes mantienen una jerarquía clara en todas las pantallas.
+La interfaz está completamente en español y sigue una estética editorial de costura artesanal: fondo papel cálido, tinta profunda, acentos terracota e hilo dorado, tipografía serif para los títulos y trazos limpios para los detalles de sastrería. La portada combina una ilustración de taller, tarjetas de servicios, productos del catálogo, proceso de trabajo, tarifas y formulario de contacto. La tipografía y los componentes mantienen una jerarquía clara en todas las pantallas.
 
 La adaptación móvil incluye menú lateral desplegable, barra superior compacta, navegación inferior, formularios en una sola columna y tablas convertidas en tarjetas para pedidos, clientes y productos. La sesión se conserva al moverse entre el sitio público y el panel.
 

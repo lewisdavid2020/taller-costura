@@ -7,10 +7,9 @@ import { AuthService } from '../admin/core/auth.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css',
 })
 export class HeaderComponent {
-  // Llega desde AppComponent: <app-header [nombre]="nombreTaller" />
+  // Llega desde LandingComponent: <app-header [nombre]="nombreTaller" />
   @Input() nombre = 'HILO & ESTILO';
 
   private readonly auth = inject(AuthService);
@@ -18,9 +17,12 @@ export class HeaderComponent {
   // Si ya hay una sesión abierta, el botón lleva directo al panel.
   readonly rutaAcceso = computed(() => (this.auth.autenticado() ? '/admin/resumen' : '/admin/login'));
   readonly etiquetaAcceso = computed(() => (this.auth.autenticado() ? 'Dashboard' : 'Iniciar sesión'));
-  readonly iconoAcceso = computed(() => (this.auth.autenticado() ? 'space_dashboard' : 'lock'));
 
   menuAbierto = false;
+
+  get partesNombre(): string[] {
+    return this.nombre.split('&').map((parte) => parte.trim());
+  }
 
   alternarMenu(): void {
     this.menuAbierto = !this.menuAbierto;

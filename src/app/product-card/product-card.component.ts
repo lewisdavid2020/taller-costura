@@ -5,7 +5,6 @@ import { formatearPrecio } from '../admin/core/formato';
   selector: 'app-product-card',
   standalone: true,
   templateUrl: './product-card.component.html',
-  styleUrl: './product-card.component.css',
 })
 export class ProductCardComponent {
   @Input() nombre = '';

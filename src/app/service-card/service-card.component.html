@@ -1,18 +1,20 @@
-<article class="tarjeta">
-  <div class="tarjeta-imagen">
-    <span class="tarjeta-numero">{{ numero < 10 ? '0' : '' }}{{ numero }}</span>
-    <span class="tarjeta-icono material-symbols-outlined" aria-hidden="true">{{ icono }}</span>
-    <span class="tarjeta-etiqueta">{{ etiqueta }}</span>
-    <span class="tarjeta-precio">{{ precio }}</span>
-  </div>
-  <div class="tarjeta-contenido">
-    <h3>{{ titulo }}</h3>
-    <p class="descripcion">{{ descripcion }}</p>
-    <ul class="beneficios">
-      @for (beneficio of beneficios; track beneficio) {
-        <li><span aria-hidden="true"></span>{{ beneficio }}</li>
-      }
-    </ul>
-    <a class="tarjeta-enlace" href="#contacto">Cotizar servicio <span aria-hidden="true">→</span></a>
+<article class="card">
+  <span class="card-num" aria-hidden="true">{{ numero < 10 ? '0' : '' }}{{ numero }}</span>
+  <span class="icon material-symbols-outlined" aria-hidden="true">{{ icono }}</span>
+  <h3 class="serif">{{ titulo }}</h3>
+  <p>{{ descripcion }}</p>
+
+  <ul>
+    @for (beneficio of beneficios; track beneficio) {
+      <li>{{ beneficio }}</li>
+    }
+  </ul>
+
+  <div class="price-row">
+    <span class="price">
+      {{ etiqueta }}
+      <b>{{ precio }}</b>
+    </span>
+    <a class="btn ghost sm" href="#contacto">Cotizar</a>
   </div>
 </article>

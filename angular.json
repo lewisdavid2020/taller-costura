@@ -17,9 +17,13 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
+            "assets": [
+              { "glob": "**/*", "input": "public" }
+            ],
             "styles": [
               "src/styles.css",
-              "src/admin.css"
+              "src/admin.css",
+              "src/public.css"
             ],
             "outputPath": "dist/taller-costura"
           },

@@ -4,9 +4,9 @@ import { Component, Input } from '@angular/core';
   selector: 'app-hero',
   standalone: true,
   templateUrl: './hero.component.html',
-  styleUrl: './hero.component.css',
 })
 export class HeroComponent {
-  // Llega desde AppComponent: <app-hero [nombre]="nombreTaller" />
   @Input() nombre = 'HILO & ESTILO';
+  @Input() totalServicios = 0;
+  @Input() totalProductos = 0;
 }
