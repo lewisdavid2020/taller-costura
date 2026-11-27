@@ -1,49 +1,56 @@
-<section id="inicio" class="hero">
-  <div class="hero-texto">
-    <p class="eyebrow">Sastrería y costura a medida</p>
-    <h1 class="serif">Tu ropa,<br /><em>a tu medida.</em></h1>
-    <p class="lead">
-      En <strong>{{ nombre }}</strong> hacemos arreglos minuciosos, composturas exactas y
-      confección personalizada para que cada prenda te quede impecable y como nueva.
-    </p>
+<section id="inicio" class="hero" data-enter>
+  <div class="wrap hero-contenido">
+    <div class="hero-texto">
+      <p class="eyebrow">Sastrería y costura a medida</p>
+      <h1 class="serif">Sastrería a tu medida,<br /><em>puntada a puntada.</em></h1>
+      <p class="lead">
+        En <strong>{{ nombre }}</strong> hacemos arreglos minuciosos, composturas exactas y
+        confección personalizada para que cada prenda te quede impecable y como nueva.
+      </p>
 
-    <div class="cta">
-      <a class="btn" href="#contacto">
-        Pedir cotización
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </a>
-      <a class="btn ghost" href="#servicios">Ver servicios</a>
+      <div class="cta">
+        <a class="btn" href="#contacto">Pedir cotización</a>
+        <a class="btn ghost" href="#servicios">Ver servicios</a>
+      </div>
+
+      <div class="stats" aria-label="Datos del taller">
+        <div class="stat">
+          <strong>{{ totalServicios }}</strong>
+          <span>servicios de costura</span>
+        </div>
+        <div class="stat">
+          <strong>{{ totalProductos }}</strong>
+          <span>piezas en catálogo</span>
+        </div>
+        <div class="stat">
+          <strong>1:1</strong>
+          <span>atención personalizada</span>
+        </div>
+      </div>
     </div>
 
-    <div class="stats" aria-label="Datos del taller">
-      <div class="stat">
-        <strong>{{ totalServicios }}</strong>
-        <span>servicios de costura</span>
-      </div>
-      <div class="stat">
-        <strong>{{ totalProductos }}</strong>
-        <span>piezas en catálogo</span>
-      </div>
-      <div class="stat">
-        <strong>1:1</strong>
-        <span>atención personalizada</span>
+    <div class="hero-figura">
+      <img
+        src="/img/hero-taller.svg"
+        alt="Ilustración de un vestido confeccionado a medida en el taller de sastrería"
+        fetchpriority="high" />
+      <div class="badge">
+        <span class="badge-punto" aria-hidden="true"></span>
+        <span class="badge-texto">
+          <b>Hecho a mano</b>
+          <span>Puntada a puntada, a tu medida.</span>
+        </span>
       </div>
     </div>
   </div>
 
-  <div class="hero-figura">
-    <img
-      src="/img/hero-taller.svg"
-      alt="Vestido de lino confeccionado a medida en el taller"
-      fetchpriority="high" />
-    <div class="badge">
-      <span class="badge-punto" aria-hidden="true"></span>
-      <span class="badge-texto">
-        <b>Hecho a mano</b>
-        <span>Puntada a puntada, a tu medida.</span>
-      </span>
+  <div class="hero-cinta" aria-label="Especialidades del taller">
+    <div class="wrap cinta-fila">
+      <span>Arreglos</span>
+      <span>Confección</span>
+      <span>Uniformes</span>
+      <span>Bordados</span>
+      <span>Composturas</span>
     </div>
   </div>
 </section>

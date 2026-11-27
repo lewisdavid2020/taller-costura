@@ -4,9 +4,9 @@
   --surface: #fffaf2;
   --surface-alta: #fffdf8;
   --ink: #1f2a37;
-  --muted: #5b6470;
-  --accent: #b4532a;
-  --accent-oscuro: #9a4522;
+  --muted: #374151;
+  --accent: #a34a22;
+  --accent-oscuro: #8e3f1c;
   --accent-suave: #f3ded0;
   --thread: #d9a441;
   --line: #e3d6c3;
@@ -75,7 +75,7 @@ h1, h2, h3, h4 {
 }
 
 :focus-visible {
-  outline: 3px solid var(--thread);
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
 
