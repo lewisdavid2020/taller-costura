@@ -116,6 +116,12 @@ El panel y el sitio están conectados a Supabase con las credenciales incluidas 
 
 El formulario público guarda cada cotización en `solicitudes_cotizacion` y, además, abre WhatsApp con el mensaje listo para enviar. El cliente no necesita cuenta: solo puede insertar su solicitud. El administrador las ve en `/admin/solicitudes`, puede marcarlas como contactadas o descartadas, y puede convertirlas en pedido indicando total y fecha de entrega. La conversión crea el registro en `orders`, lo relaciona con `solicitud_id` y guarda `creado_por` con el administrador autenticado.
 
+## Pendiente
+
+- **Inicio de sesión con Google**: agregar autenticación con cuenta de Google en el acceso del panel.
+- **Gestión de clientes**: definir el comportamiento cuando un pedido pasa a estado `entregado`: eliminar el cliente relacionado, o permitir limpiar la lista/vista sin eliminar el registro del cliente.
+- **Solicitudes descartadas**: permitir eliminar solicitudes cuando su estado sea `descartada`.
+
 ## Verificación
 
 - `npm run build`: compila la aplicación para producción.
