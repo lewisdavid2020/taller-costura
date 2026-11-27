@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { CatalogService } from '../admin/core/catalog.service';
 import { WorkshopService } from '../admin/core/workshop.service';
 import { HeaderComponent } from '../header/header.component';
@@ -10,7 +11,7 @@ import { ContactComponent } from '../contact/contact.component';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [HeaderComponent, HeroComponent, ProductCardComponent, ServiceCardComponent, ContactComponent],
+  imports: [RouterLink, HeaderComponent, HeroComponent, ProductCardComponent, ServiceCardComponent, ContactComponent],
   templateUrl: './landing.component.html',
 })
 export class LandingComponent {

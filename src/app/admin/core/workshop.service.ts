@@ -3,11 +3,11 @@ import { supabase, supabaseConfigurado } from './supabase.client';
 import { DatosTaller } from './modelos';
 
 const DATOS_INICIALES: DatosTaller = {
-  nombre: 'Nombre del Taller',
+  nombre: 'Julia Rosa Creaciones',
   whatsapp: '00000000000',
   direccion: 'Calle Ejemplo 123',
   horario: 'Lunes a sábado, 9:00 a 18:00',
-  correo: 'hola@nombredeltaller.com',
+  correo: 'hola@juliarosacreaciones.com',
 };
 
 @Injectable({ providedIn: 'root' })

@@ -5,7 +5,12 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./landing/landing.component').then((m) => m.LandingComponent),
-    title: 'HILO & ESTILO — Sastrería y costura a medida',
+    title: 'Julia Rosa Creaciones — Sastrería y costura a medida',
+  },
+  {
+    path: 'productos',
+    loadComponent: () => import('./productos/productos.component').then((m) => m.ProductosComponent),
+    title: 'Productos — Julia Rosa Creaciones',
   },
   {
     path: 'admin/login',

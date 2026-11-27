@@ -10,7 +10,7 @@ import { AuthService } from '../admin/core/auth.service';
 })
 export class HeaderComponent {
   // Llega desde LandingComponent: <app-header [nombre]="nombreTaller" />
-  @Input() nombre = 'HILO & ESTILO';
+  @Input() nombre = 'Julia Rosa Creaciones';
 
   private readonly auth = inject(AuthService);
 

@@ -1,0 +1,135 @@
+<div class="landing pagina-productos">
+  <app-header [nombre]="nombreTaller" />
+
+  <main>
+    <section class="productos-hero">
+      <div class="wrap">
+        <p class="eyebrow">Catálogo</p>
+        <h1 class="serif">Productos del taller</h1>
+        <p class="productos-intro">
+          Piezas confeccionadas y servicios con acabado artesanal. Explora por categoría y encuentra la opción
+          que mejor se adapte a lo que necesitas.
+        </p>
+      </div>
+    </section>
+
+    <section class="productos-seccion">
+      <div class="wrap productos-layout">
+        <aside class="filtros" aria-labelledby="titulo-categorias">
+          <div class="filtros-cabecera">
+            <p class="eyebrow">Filtrar</p>
+            <h2 id="titulo-categorias" class="serif">Categorías</h2>
+          </div>
+
+          <nav aria-label="Categorías de productos">
+            <ul class="categorias-lista">
+              <li>
+                <button
+                  type="button"
+                  class="categoria-btn"
+                  [class.activa]="esCategoriaActiva('todas')"
+                  [attr.aria-pressed]="esCategoriaActiva('todas')"
+                  (click)="seleccionarCategoria('todas')">
+                  <span class="categoria-nombre">
+                    <span class="material-symbols-outlined" aria-hidden="true">grid_view</span>
+                    Todas
+                  </span>
+                  <span class="categoria-conteo">{{ productosActivos().length }}</span>
+                </button>
+              </li>
+
+              @for (categoria of categorias; track categoria) {
+                <li>
+                  <button
+                    type="button"
+                    class="categoria-btn"
+                    [class.activa]="esCategoriaActiva(categoria)"
+                    [attr.aria-pressed]="esCategoriaActiva(categoria)"
+                    (click)="seleccionarCategoria(categoria)">
+                    <span class="categoria-nombre">
+                      <span class="material-symbols-outlined" aria-hidden="true">{{ iconos[categoria] }}</span>
+                      {{ categoria }}
+                    </span>
+                    <span class="categoria-conteo">{{ conteoPorCategoria()[categoria] }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          </nav>
+        </aside>
+
+        <div class="catalogo">
+          <div class="catalogo-barra">
+            <div>
+              <p class="catalogo-resultado">
+                <strong>{{ productosFiltrados().length }}</strong>
+                {{ productosFiltrados().length === 1 ? 'producto' : 'productos' }}
+                <span class="catalogo-categoria">en {{ etiquetaCategoria(categoriaSeleccionada()) }}</span>
+              </p>
+            </div>
+
+            <label class="orden-control" for="orden-productos">
+              <span>Ordenar por</span>
+              <select id="orden-productos" [value]="ordenSeleccionado()" (change)="cambiarOrden($event)">
+                <option value="destacados">Destacados</option>
+                <option value="precio-asc">Precio: menor a mayor</option>
+                <option value="precio-desc">Precio: mayor a menor</option>
+                <option value="nombre">Nombre</option>
+              </select>
+            </label>
+          </div>
+
+          @if (productosFiltrados().length > 0) {
+            <div class="grid-productos catalogo-grid">
+              @for (producto of productosFiltrados(); track producto.id; let indice = $index) {
+                <app-product-card
+                  [nombre]="producto.nombre"
+                  [descripcion]="producto.descripcion"
+                  [categoria]="producto.categoria"
+                  [precio]="producto.precio"
+                  [imagen]="producto.imagenes[0] ?? ''"
+                  [numero]="indice + 1" />
+              }
+            </div>
+          } @else {
+            <div class="catalogo-vacio">
+              <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+              <h3 class="serif">No hay productos en esta categoría</h3>
+              <p>Prueba seleccionando otra categoría para ver más piezas del taller.</p>
+              <button type="button" class="btn ghost sm" (click)="seleccionarCategoria('todas')">Ver todos</button>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <div class="footer-fila">
+        <div class="footer-marca">
+          <a class="footer-logo" href="/">
+            @if (nombreTaller.includes('&')) {
+              {{ nombreTaller.split('&')[0].trim() }} <span>&amp;</span> {{ nombreTaller.split('&')[1].trim() }}
+            } @else {
+              {{ nombreTaller }}
+            }
+          </a>
+          <p>Sastrería y costura a medida.</p>
+        </div>
+
+        <nav aria-label="Enlaces del pie de página">
+          <a href="/#servicios">Servicios</a>
+          <a href="/productos">Productos</a>
+          <a href="/#proceso">Proceso</a>
+          <a href="/#contacto">Contacto</a>
+        </nav>
+      </div>
+
+      <div class="footer-base">
+        <p>© {{ anio }} {{ nombreTaller }}. Todos los derechos reservados.</p>
+        <p>Hecho con calma, puntada a puntada.</p>
+      </div>
+    </div>
+  </footer>
+</div>

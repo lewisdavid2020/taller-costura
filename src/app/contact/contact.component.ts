@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './contact.component.html',
 })
 export class ContactComponent {
-  @Input() nombreTaller = 'HILO & ESTILO';
+  @Input() nombreTaller = 'Julia Rosa Creaciones';
   @Input() whatsapp = '00000000000';
   @Input() servicios: string[] = [];
 

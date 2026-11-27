@@ -6,7 +6,7 @@ import { Component, Input } from '@angular/core';
   templateUrl: './hero.component.html',
 })
 export class HeroComponent {
-  @Input() nombre = 'HILO & ESTILO';
+  @Input() nombre = 'Julia Rosa Creaciones';
   @Input() totalServicios = 0;
   @Input() totalProductos = 0;
 }

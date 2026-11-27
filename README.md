@@ -1,4 +1,4 @@
-# Taller de Costura
+# Julia Rosa Creaciones
 
 Sitio web y panel de administración para un taller de costura y sastrería. La página pública presenta los servicios del taller y permite solicitar una cotización; el panel privado centraliza la operación diaria: productos, pedidos, clientes y configuración.
 
@@ -99,4 +99,4 @@ El panel y el sitio ya están conectados a la estructura de Supabase. Para que l
 
 ## Verificación
 
-El proyecto compila correctamente para producción y cuenta con pruebas automatizadas que cubren el sitio público, el acceso, el registro, el panel, los productos, los pedidos, los clientes y la navegación responsive.
+El proyecto compila correctamente para producción y cuenta con pruebas automatizadas que cubren el sitio público, el acceso, el registro, el panel, los productos, los pedidos, los clientes y la navegación responsive.
