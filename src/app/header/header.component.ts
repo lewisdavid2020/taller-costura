@@ -11,7 +11,7 @@ import { AuthService } from '../admin/core/auth.service';
 })
 export class HeaderComponent {
   // Llega desde AppComponent: <app-header [nombre]="nombreTaller" />
-  @Input() nombre = 'Nombre del Taller';
+  @Input() nombre = 'HILO & ESTILO';
 
   private readonly auth = inject(AuthService);
 

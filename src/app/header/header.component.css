@@ -142,6 +142,11 @@
   .menu { gap: 1.85rem; }
 }
 
+@media (min-width: 1200px) {
+  .barra { min-height: 72px; }
+  .menu { gap: 2.2rem; }
+}
+
 @media (max-width: 420px) {
   .marca-texto strong { font-size: 0.9rem; }
   .marca-icono { width: 34px; }

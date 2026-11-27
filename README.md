@@ -1,4 +1,4 @@
-# Taller de Costura
+# HILO & ESTILO
 
 Sitio web y panel de administración para un taller de costura y sastrería. La página pública presenta los servicios del taller y permite solicitar una cotización; el panel privado centraliza la operación diaria: productos, pedidos, clientes y configuración.
 

@@ -20,7 +20,7 @@ export class LandingComponent {
   readonly productos = computed(() => this.catalogo.productos().filter((producto) => producto.estado === 'activo'));
 
   // Cambia aquí el nombre de tu negocio y tu WhatsApp (con código de país, sin + ni espacios).
-  nombreTaller = 'Nombre del Taller';
+  nombreTaller = 'HILO & ESTILO';
   whatsapp = '00000000000';
   anio = new Date().getFullYear();
 

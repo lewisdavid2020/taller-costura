@@ -47,6 +47,18 @@ a { color: inherit; }
 
 .container { width: min(1160px, 100% - 3rem); margin-inline: auto; }
 
+@media (min-width: 1200px) {
+  .container { width: min(1240px, 100% - 4rem); }
+}
+
+@media (min-width: 1500px) {
+  .container { width: min(1380px, 100% - 5rem); }
+}
+
+@media (min-width: 1800px) {
+  .container { width: min(1500px, 100% - 6rem); }
+}
+
 .tape {
   position: relative;
   height: 22px;

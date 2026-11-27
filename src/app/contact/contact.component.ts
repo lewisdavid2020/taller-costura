@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ContactComponent {
   // Los 3 llegan desde AppComponent
-  @Input() nombreTaller = 'Nombre del Taller';
+  @Input() nombreTaller = 'HILO & ESTILO';
   @Input() whatsapp = '00000000000';
   @Input() servicios: string[] = [];
 

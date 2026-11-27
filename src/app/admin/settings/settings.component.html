@@ -73,23 +73,6 @@
       </div>
 
       <div class="adm-field">
-        <label for="ajuste-direccion">Dirección <span class="adm-obligatorio" aria-hidden="true">*</span></label>
-        <input
-          id="ajuste-direccion"
-          class="adm-input"
-          type="text"
-          formControlName="direccion"
-          autocomplete="street-address"
-          [attr.aria-invalid]="mensajeDireccion() ? 'true' : null"
-          [attr.aria-describedby]="mensajeDireccion() ? 'error-ajuste-direccion' : null" />
-        @if (mensajeDireccion(); as mensaje) {
-          <p class="adm-error" id="error-ajuste-direccion">
-            <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
-          </p>
-        }
-      </div>
-
-      <div class="adm-field">
         <label for="ajuste-horario">Horario de atención <span class="adm-obligatorio" aria-hidden="true">*</span></label>
         <input
           id="ajuste-horario"

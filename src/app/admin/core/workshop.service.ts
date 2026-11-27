@@ -3,12 +3,13 @@ import { DatosTaller } from './modelos';
 
 const CLAVE_TALLER = 'taller.admin.datos.v1';
 
+const NOMBRES_ANTERIORES = ['Nombre del Taller', 'Taller de Costura', 'taller de costura'];
+
 const DATOS_INICIALES: DatosTaller = {
-  nombre: 'Nombre del Taller',
+  nombre: 'HILO & ESTILO',
   whatsapp: '00000000000',
-  direccion: 'Calle Ejemplo 123',
   horario: 'Lunes a sábado, 9:00 a 18:00',
-  correo: 'hola@nombredeltaller.com',
+  correo: 'hola@hiloestilo.com',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -30,10 +31,12 @@ export class WorkshopService {
       const crudo = localStorage.getItem(CLAVE_TALLER);
       if (!crudo) return { ...DATOS_INICIALES };
       const datos = JSON.parse(crudo) as Partial<DatosTaller>;
+      const nombreGuardado = typeof datos.nombre === 'string' ? datos.nombre.trim() : '';
+      const nombre =
+        nombreGuardado && !NOMBRES_ANTERIORES.includes(nombreGuardado) ? datos.nombre! : DATOS_INICIALES.nombre;
       return {
-        nombre: typeof datos.nombre === 'string' && datos.nombre.trim() ? datos.nombre : DATOS_INICIALES.nombre,
+        nombre,
         whatsapp: typeof datos.whatsapp === 'string' ? datos.whatsapp : DATOS_INICIALES.whatsapp,
-        direccion: typeof datos.direccion === 'string' ? datos.direccion : DATOS_INICIALES.direccion,
         horario: typeof datos.horario === 'string' ? datos.horario : DATOS_INICIALES.horario,
         correo: typeof datos.correo === 'string' ? datos.correo : DATOS_INICIALES.correo,
       };

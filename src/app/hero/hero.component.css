@@ -216,3 +216,14 @@ h1 span { color: var(--denim); }
   .muestra-porcentaje { display: none; }
   .proceso h2 { font-size: 0.58rem; }
 }
+
+@media (min-width: 1200px) {
+  .hero { padding: 5.5rem 0 5rem; }
+  .hero-principal { grid-template-columns: 1.05fr 0.95fr; gap: 4rem; }
+  h1 { font-size: clamp(3.4rem, 4.4vw, 4.9rem); }
+  .lead { max-width: 60ch; font-size: 1.1rem; }
+  .hero-visual { min-height: 500px; }
+  .aro-costura { min-height: 390px; }
+  .maquina { width: min(92%, 430px); }
+  .proceso { margin-top: 4rem; padding: 2.2rem 1.6rem 1.35rem; }
+}

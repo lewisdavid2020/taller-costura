@@ -5,7 +5,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./landing/landing.component').then((m) => m.LandingComponent),
-    title: 'Nombre del Taller — Sastrería y costura a medida',
+    title: 'HILO & ESTILO — Sastrería y costura a medida',
   },
   {
     path: 'admin/login',

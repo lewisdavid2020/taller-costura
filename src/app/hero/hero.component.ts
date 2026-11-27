@@ -8,5 +8,5 @@ import { Component, Input } from '@angular/core';
 })
 export class HeroComponent {
   // Llega desde AppComponent: <app-hero [nombre]="nombreTaller" />
-  @Input() nombre = 'Nombre del Taller';
+  @Input() nombre = 'HILO & ESTILO';
 }

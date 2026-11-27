@@ -74,3 +74,11 @@ textarea { min-height: 110px; padding-right: 0.85rem; resize: vertical; }
   .formulario-panel { padding: 2rem; }
   .datos-taller { padding: 1.4rem; }
 }
+
+@media (min-width: 1200px) {
+  .contacto { padding: 6rem 0; }
+  .rejilla { grid-template-columns: 5.5fr 6.5fr; gap: 4rem; }
+  .intro { font-size: 1rem; }
+  .formulario-panel { padding: 2.5rem; }
+  .datos-taller { padding: 1.6rem; }
+}

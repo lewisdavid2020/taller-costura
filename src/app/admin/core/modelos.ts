@@ -47,7 +47,6 @@ export interface ClienteResumen {
 export interface DatosTaller {
   nombre: string;
   whatsapp: string;
-  direccion: string;
   horario: string;
   correo: string;
 }
