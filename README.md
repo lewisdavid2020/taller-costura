@@ -52,15 +52,15 @@ La adaptación móvil incluye menú lateral desplegable, barra superior compacta
 
 El proyecto ya incluye la integración con Supabase:
 
-- Cliente y configuración: `taller-costura/src/app/admin/core/supabase.client.ts` y `taller-costura/src/environments/`.
+- Cliente y configuración: `src/app/admin/core/supabase.client.ts` y `src/environments/`.
 - Migración SQL: `supabase/migrations/20261127000000_init.sql`.
 - Script en español para copiar/pegar en SQL Editor: `supabase/script_base_datos_taller_es.sql`.
 
 ### Configuración rápida
 
 1. Configura las claves en:
-   - `taller-costura/src/environments/environment.ts`
-   - `taller-costura/src/environments/environment.development.ts`
+   - `src/environments/environment.ts`
+   - `src/environments/environment.development.ts`
 2. Coloca tu `supabaseUrl` y `supabaseAnonKey`.
 3. Ejecuta la migración SQL en Supabase si aún no está aplicada.
 4. Revisa en Supabase Auth la confirmación de correo según tu flujo de pruebas.
