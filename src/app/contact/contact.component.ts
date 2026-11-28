@@ -1,6 +1,7 @@
 import { Component, Input, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SolicitudesService } from '../admin/core/solicitudes.service';
+import { enlaceWhatsapp } from './whatsapp';
 
 @Component({
   selector: 'app-contact',
@@ -25,7 +26,7 @@ export class ContactComponent {
 
   get enlaceWhatsApp(): string {
     const texto = `¡Hola! Quisiera cotizar un trabajo en ${this.nombreTaller}.`;
-    return `https://wa.me/${this.whatsapp}?text=${encodeURIComponent(texto)}`;
+    return `${enlaceWhatsapp(this.whatsapp)}?text=${encodeURIComponent(texto)}`;
   }
 
   enviar(): void {
@@ -87,6 +88,6 @@ export class ContactComponent {
       .filter(Boolean)
       .join('\n');
 
-    return `https://wa.me/${this.whatsapp}?text=${encodeURIComponent(texto)}`;
+    return `${enlaceWhatsapp(this.whatsapp)}?text=${encodeURIComponent(texto)}`;
   }
 }

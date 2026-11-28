@@ -47,6 +47,7 @@
             inputmode="tel"
             [attr.aria-invalid]="mensajeWhatsapp() ? 'true' : null"
             [attr.aria-describedby]="mensajeWhatsapp() ? 'error-ajuste-whatsapp' : null" />
+          <p class="adm-field__ayuda">Puedes incluir el código internacional; los celulares colombianos de 10 dígitos que empiezan en 3 reciben el prefijo 57 automáticamente.</p>
           @if (mensajeWhatsapp(); as mensaje) {
             <p class="adm-error" id="error-ajuste-whatsapp">
               <span class="material-symbols-outlined" aria-hidden="true">error</span>{{ mensaje }}
