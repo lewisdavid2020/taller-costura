@@ -54,7 +54,7 @@ export class AuthService {
       }
       this.sesionActual.set(this.mapearUsuario(user));
       void this.cargarPerfil(user.id, user.email ?? '');
-      void this.cargarRol(user.id);
+      void this.verificarAcceso(user.id);
     });
 
     this.listoState.set(true);
@@ -89,6 +89,28 @@ export class AuthService {
         error: 'Tu cuenta no tiene permisos de administrador.',
       };
     }
+    return { ok: true };
+  }
+
+  async iniciarSesionConGoogle(returnUrl: string): Promise<ResultadoAcceso> {
+    if (!this.configurado) {
+      return { ok: false, error: 'Supabase no está configurado. Agrega tu anon key en environments.' };
+    }
+
+    const redirectTo = new URL('/admin/login', window.location.origin);
+    redirectTo.searchParams.set('returnUrl', returnUrl);
+
+    const { error } = await this.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectTo.toString(),
+      },
+    });
+
+    if (error) {
+      return { ok: false, error: 'No pudimos iniciar sesión con Google. Inténtalo de nuevo.' };
+    }
+
     return { ok: true };
   }
 
@@ -159,6 +181,16 @@ export class AuthService {
 
     if (this.sesionActual()?.id !== userId) return;
     this.esAdminState.set(!error && data?.role === 'admin');
+  }
+
+  private async verificarAcceso(userId: string): Promise<void> {
+    await this.cargarRol(userId);
+    if (this.sesionActual()?.id !== userId) return;
+    if (this.esAdminState()) return;
+
+    if (this.configurado) await this.supabase.auth.signOut();
+    this.sesionActual.set(null);
+    this.esAdminState.set(false);
   }
 
   private async cargarPerfil(userId: string, correoFallback: string): Promise<void> {

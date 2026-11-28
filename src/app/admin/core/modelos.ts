@@ -35,9 +35,10 @@ export interface Pedido {
   estado: EstadoPedido;
   solicitudId?: string;
   creadoPor?: string;
+  archivado: boolean;
 }
 
-export type EstadoSolicitud = 'nueva' | 'contactada' | 'convertida' | 'descartada';
+export type EstadoSolicitud = 'nueva' | 'contactada' | 'confirmada' | 'cancelada';
 
 export interface SolicitudCotizacion {
   id: string;

@@ -78,6 +78,36 @@ describe('OrdersService', () => {
     expect(servicio.pedidos().find((pedido) => pedido.id === '1')?.estado).toBe('entregado');
   });
 
+  it('archiva un pedido entregado sin afectar las métricas de ingreso', async () => {
+    establecerFilas({
+      orders: [filaPedido('1', 'entregado', fechaEsteMes, 100, 'Confección', 'a@ejemplo.com')],
+    });
+    const servicio = crearServicio();
+    await servicio.cargar();
+
+    expect(servicio.pedidosVisibles().length).toBe(1);
+    expect(await servicio.archivar('1')).toBe(true);
+
+    expect(servicio.pedidosVisibles().length).toBe(0);
+    expect(servicio.archivados().length).toBe(1);
+    expect(servicio.ingresosDelMes()).toBe(100);
+    expect(servicio.recientes().length).toBe(0);
+
+    expect(await servicio.restaurar('1')).toBe(true);
+    expect(servicio.pedidosVisibles().length).toBe(1);
+  });
+
+  it('no archiva pedidos que no estén entregados', async () => {
+    establecerFilas({
+      orders: [filaPedido('1', 'pendiente', fechaEsteMes, 50, 'Arreglos', 'a@ejemplo.com')],
+    });
+    const servicio = crearServicio();
+    await servicio.cargar();
+
+    expect(await servicio.archivar('1')).toBe(false);
+    expect(servicio.pedidosVisibles().length).toBe(1);
+  });
+
   it('convierte una solicitud en pedido y la relaciona', async () => {
     establecerFilas({
       solicitudes_cotizacion: [

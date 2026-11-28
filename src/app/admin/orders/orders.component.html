@@ -1,7 +1,26 @@
 <app-page-header
   eyebrow="Operación del taller"
   titulo="Pedidos"
-  [descripcion]="pedidos().length + ' pedidos registrados. Sigue el avance de cada trabajo y actualiza su estado.'" />
+  [descripcion]="pedidosVisibles().length + ' pedidos registrados. Sigue el avance de cada trabajo y actualiza su estado.'">
+  @if (archivados().length > 0 || mostrarArchivados()) {
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="alternarArchivados()">
+      <span class="material-symbols-outlined" aria-hidden="true">
+        {{ mostrarArchivados() ? 'inventory_2' : 'visibility' }}
+      </span>
+      {{ mostrarArchivados() ? 'Ver activos' : 'Ver eliminados (' + archivados().length + ')' }}
+    </button>
+  }
+</app-page-header>
+
+@if (mostrarArchivados()) {
+  <div class="adm-alerta adm-alerta--info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <p>
+      Estos pedidos se eliminaron de la lista, pero siguen contando en las métricas de ingresos.
+      Puedes restaurarlos cuando quieras.
+    </p>
+  </div>
+}
 
 <div class="filtros-fila" role="group" aria-label="Filtrar pedidos por estado">
   <button
@@ -40,6 +59,7 @@
             <th scope="col">Total</th>
             <th scope="col">Estado</th>
             <th scope="col">Actualizar estado</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -66,11 +86,25 @@
                   class="adm-input selector-estado"
                   [id]="'estado-' + pedido.id"
                   [value]="pedido.estado"
+                  [disabled]="pedido.archivado"
                   (change)="cambiarEstado(pedido, $event)">
                   @for (estado of estados; track estado) {
                     <option [value]="estado">{{ etiqueta(estado) }}</option>
                   }
                 </select>
+              </td>
+              <td>
+                @if (pedido.archivado) {
+                  <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="restaurar(pedido)">
+                    Restaurar
+                  </button>
+                } @else if (pedido.estado === 'entregado') {
+                  <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="eliminar(pedido)">
+                    Eliminar
+                  </button>
+                } @else {
+                  <span class="conversion__nota">—</span>
+                }
               </td>
             </tr>
           }
@@ -124,12 +158,29 @@
           <select
             class="adm-input selector-estado"
             [value]="pedido.estado"
+            [disabled]="pedido.archivado"
             (change)="cambiarEstado(pedido, $event)">
             @for (estado of estados; track estado) {
               <option [value]="estado">{{ etiqueta(estado) }}</option>
             }
           </select>
         </label>
+
+        @if (pedido.archivado) {
+          <button
+            class="adm-btn adm-btn--fantasma adm-btn--sm adm-btn--bloque"
+            type="button"
+            (click)="restaurar(pedido)">
+            Restaurar pedido
+          </button>
+        } @else if (pedido.estado === 'entregado') {
+          <button
+            class="adm-btn adm-btn--fantasma adm-btn--sm adm-btn--bloque"
+            type="button"
+            (click)="eliminar(pedido)">
+            Eliminar de la lista
+          </button>
+        }
       </article>
     }
     <p class="lista-movil__nota">Mostrando {{ formatearNumero(filtrados().length) }} pedidos</p>
@@ -139,8 +190,16 @@
     <span class="empty-state__icono" aria-hidden="true">
       <span class="material-symbols-outlined">receipt_long</span>
     </span>
-    <h2>No hay pedidos en este estado</h2>
-    <p>Cambia el filtro para revisar el resto de la operación del taller.</p>
-    <button class="adm-btn adm-btn--fantasma" type="button" (click)="filtro.set('todos')">Ver todos los pedidos</button>
+    @if (mostrarArchivados()) {
+      <h2>No hay pedidos eliminados</h2>
+      <p>Los pedidos entregados que elimines aparecerán aquí y podrás restaurarlos.</p>
+      <button class="adm-btn adm-btn--fantasma" type="button" (click)="alternarArchivados()">
+        Ver pedidos activos
+      </button>
+    } @else {
+      <h2>No hay pedidos en este estado</h2>
+      <p>Cambia el filtro para revisar el resto de la operación del taller.</p>
+      <button class="adm-btn adm-btn--fantasma" type="button" (click)="filtro.set('todos')">Ver todos los pedidos</button>
+    }
   </div>
 }

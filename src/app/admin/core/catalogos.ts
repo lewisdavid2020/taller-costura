@@ -29,20 +29,20 @@ export const CLASE_ESTADO: Record<EstadoPedido, string> = {
   entregado: 'estado--entregado',
 };
 
-export const ESTADOS_SOLICITUD: EstadoSolicitud[] = ['nueva', 'contactada', 'convertida', 'descartada'];
+export const ESTADOS_SOLICITUD: EstadoSolicitud[] = ['nueva', 'contactada', 'confirmada', 'cancelada'];
 
 export const ETIQUETA_SOLICITUD: Record<EstadoSolicitud, string> = {
   nueva: 'Nueva',
   contactada: 'Contactada',
-  convertida: 'Convertida',
-  descartada: 'Descartada',
+  confirmada: 'Confirmada',
+  cancelada: 'Cancelada',
 };
 
 export const CLASE_SOLICITUD: Record<EstadoSolicitud, string> = {
   nueva: 'estado--pendiente',
   contactada: 'estado--proceso',
-  convertida: 'estado--listo',
-  descartada: 'estado--entregado',
+  confirmada: 'estado--listo',
+  cancelada: 'estado--entregado',
 };
 
 export const ICONO_CATEGORIA: Record<CategoriaProducto, string> = {

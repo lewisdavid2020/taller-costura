@@ -205,8 +205,8 @@ export function crearSupabaseFalso() {
         const solicitudes = tablas.get('solicitudes_cotizacion') ?? [];
         const solicitud = solicitudes.find((fila) => fila['id'] === args['p_solicitud_id']);
         if (!solicitud) return { data: null, error: { message: 'La solicitud no existe.' } };
-        if (solicitud['estado'] === 'convertida') {
-          return { data: null, error: { message: 'La solicitud ya fue convertida en pedido.' } };
+        if (solicitud['estado'] === 'confirmada') {
+          return { data: null, error: { message: 'La solicitud ya fue confirmada en pedido.' } };
         }
 
         const pedidos = tablas.get('orders') ?? [];
@@ -227,7 +227,7 @@ export function crearSupabaseFalso() {
         };
         pedidos.push(pedido);
         tablas.set('orders', pedidos);
-        solicitud['estado'] = 'convertida';
+        solicitud['estado'] = 'confirmada';
         return { data: pedido, error: null };
       }
       return { data: null, error: { message: `RPC no simulada: ${fn}` } };

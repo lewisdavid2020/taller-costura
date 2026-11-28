@@ -122,10 +122,27 @@
           class="adm-btn adm-btn--primario adm-btn--bloque"
           type="submit"
           [class.adm-btn--cargando]="cargando()"
-          [disabled]="cargando()">
+          [disabled]="cargando() || cargandoGoogle()">
           {{ cargando() ? 'Entrando' : 'Entrar' }}
         </button>
       </form>
+
+      <div class="auth-separador" aria-hidden="true"><span>o continúa con</span></div>
+
+      <button
+        class="adm-btn adm-btn--fantasma adm-btn--bloque"
+        type="button"
+        [class.adm-btn--cargando]="cargandoGoogle()"
+        [disabled]="cargando() || cargandoGoogle()"
+        (click)="entrarConGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="#4285F4" d="M21.805 10.023H12v3.955h5.627c-.243 1.3-.972 2.402-2.073 3.142v2.61h3.353c1.962-1.807 3.098-4.468 3.098-7.707 0-.744-.067-1.46-.2-2z"/>
+          <path fill="#34A853" d="M12 22c2.7 0 4.965-.895 6.62-2.27l-3.353-2.61c-.928.622-2.116.99-3.267.99-2.512 0-4.64-1.696-5.4-3.975H3.13v2.695A9.996 9.996 0 0 0 12 22z"/>
+          <path fill="#FBBC05" d="M6.6 14.135A6.01 6.01 0 0 1 6.287 12c0-.74.127-1.46.313-2.135V7.17H3.13A9.996 9.996 0 0 0 2 12c0 1.614.386 3.14 1.13 4.83l3.47-2.695z"/>
+          <path fill="#EA4335" d="M12 5.96c1.468 0 2.787.505 3.824 1.496l2.868-2.868C16.958 2.99 14.693 2 12 2A9.996 9.996 0 0 0 3.13 7.17l3.47 2.695C7.36 7.656 9.488 5.96 12 5.96z"/>
+        </svg>
+        {{ cargandoGoogle() ? 'Conectando con Google' : 'Continuar con Google' }}
+      </button>
 
       <a class="adm-btn adm-btn--fantasma adm-btn--bloque auth-volver" routerLink="/">
         <span class="material-symbols-outlined" aria-hidden="true">storefront</span>

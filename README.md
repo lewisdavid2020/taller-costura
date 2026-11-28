@@ -24,13 +24,13 @@ El acceso al panel está disponible desde el encabezado del sitio público. Cuan
 
 El panel se organiza en las siguientes pantallas:
 
-- Acceso: inicio de sesión y registro privado mediante invitación.
+- Acceso: inicio de sesión con correo/contraseña o con Google, y registro privado mediante invitación.
 - Resumen: indicadores de ventas, pedidos activos, clientes y productos, además de gráficos de actividad y pendientes del taller.
 - Productos: catálogo completo con búsqueda, filtros, disponibilidad y acceso al formulario de cada producto.
 - Formulario de producto: creación y edición de datos, precios, categorías, existencias y carga de fotografías.
-- Pedidos: seguimiento de todos los trabajos, filtros por estado y actualización del avance de cada pedido. Los pedidos creados desde una solicitud quedan relacionados con ella.
-- Solicitudes: cotizaciones enviadas desde el formulario público, con datos de contacto, seguimiento de estado y conversión a pedido.
-- Clientes: directorio con datos de contacto, número de pedidos, total entregado y último pedido.
+- Pedidos: seguimiento de todos los trabajos, filtros por estado y actualización del avance de cada pedido. Los pedidos creados desde una solicitud quedan relacionados con ella. Los pedidos entregados se pueden eliminar de la lista sin afectar las métricas de ingresos y restaurar desde «Ver eliminados».
+- Solicitudes: cotizaciones enviadas desde el formulario público, con datos de contacto, seguimiento de estado, conversión a pedido y eliminación individual o masiva cuando están canceladas.
+- Clientes: directorio con datos de contacto, número de pedidos, total entregado y último pedido. Permite ocultar clientes individualmente o limpiar toda la lista sin eliminar sus pedidos.
 - Configuración: información general del taller y preferencias del panel.
 
 Dentro del panel, el botón Principal permite volver al sitio público sin cerrar la sesión. En celular, este acceso aparece también en la barra superior junto a la salida de sesión.
@@ -114,13 +114,13 @@ SSL: requerido
 
 El panel y el sitio están conectados a Supabase con las credenciales incluidas en `src/environments/`. Las imágenes de productos se suben a Supabase Storage. Los listados muestran únicamente las filas existentes en la base de datos: no se generan productos, pedidos ni datos de taller de demostración.
 
-El formulario público guarda cada cotización en `solicitudes_cotizacion` y, además, abre WhatsApp con el mensaje listo para enviar. El cliente no necesita cuenta: solo puede insertar su solicitud. El administrador las ve en `/admin/solicitudes`, puede marcarlas como contactadas o descartadas, y puede convertirlas en pedido indicando total y fecha de entrega. La conversión crea el registro en `orders`, lo relaciona con `solicitud_id` y guarda `creado_por` con el administrador autenticado.
+El formulario público guarda cada cotización en `solicitudes_cotizacion` y, además, abre WhatsApp con el mensaje listo para enviar. El cliente no necesita cuenta: solo puede insertar su solicitud. El administrador las ve en `/admin/solicitudes`, puede marcarlas como contactadas o canceladas, eliminarlas cuando estén canceladas y convertirlas en pedido indicando total y fecha de entrega. Al convertirlas, la solicitud pasa a estado `confirmada`. La conversión crea el registro en `orders`, lo relaciona con `solicitud_id` y guarda `creado_por` con el administrador autenticado.
 
-## Pendiente
+## Acceso con Google
 
-- **Inicio de sesión con Google**: agregar autenticación con cuenta de Google en el acceso del panel.
-- **Gestión de clientes**: definir el comportamiento cuando un pedido pasa a estado `entregado`: eliminar el cliente relacionado, o permitir limpiar la lista/vista sin eliminar el registro del cliente.
-- **Solicitudes descartadas**: permitir eliminar solicitudes cuando su estado sea `descartada`.
+El botón «Continuar con Google» ya está implementado en el login. Para habilitarlo hay que configurar el cliente OAuth en Google Cloud, activar el proveedor en Supabase y decidir cómo se autoriza a los administradores nuevos (rol manual, invitación con Edge Function o lista de correos permitidos).
+
+La guía completa, con pasos, SQL, código de la Edge Function y solución de problemas, está en [`docs/google-auth.md`](docs/google-auth.md).
 
 ## Verificación
 

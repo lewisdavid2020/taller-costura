@@ -1,9 +1,22 @@
 <app-page-header
   eyebrow="Relación con clientes"
   titulo="Clientes"
-  [descripcion]="clientes().length + ' clientes con pedidos en el taller. Consulta su historial y valor de compra.'" />
+  [descripcion]="clientesVisibles().length + ' clientes con pedidos en el taller. Consulta su historial y valor de compra.'">
+  @if (clientesVisibles().length > 0) {
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="limpiarLista()">
+      <span class="material-symbols-outlined" aria-hidden="true">cleaning_services</span>
+      Limpiar lista
+    </button>
+  }
+  @if (totalOcultos() > 0) {
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="restaurarOcultos()">
+      <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+      Mostrar ocultos ({{ totalOcultos() }})
+    </button>
+  }
+</app-page-header>
 
-@if (clientes().length > 0) {
+@if (clientesVisibles().length > 0) {
   <div class="adm-card data-card data-card--desktop">
     <div class="data-tabla-scroll">
       <table class="data-tabla tabla-pedidos">
@@ -14,10 +27,11 @@
             <th scope="col">Pedidos</th>
             <th scope="col">Total entregado</th>
             <th scope="col">Último pedido</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          @for (cliente of clientes(); track cliente.correo) {
+          @for (cliente of clientesVisibles(); track cliente.correo) {
             <tr>
               <td>
                 <div class="cliente-celda">
@@ -32,6 +46,15 @@
               <td><span class="data-tabla__numero">{{ cliente.pedidos }}</span></td>
               <td><span class="data-tabla__numero">{{ formatearPrecio(cliente.totalGastado) }}</span></td>
               <td>{{ formatearFecha(cliente.ultimoPedido) }}</td>
+              <td>
+                <button
+                  class="adm-btn adm-btn--fantasma adm-btn--sm"
+                  type="button"
+                  [attr.aria-label]="'Ocultar a ' + cliente.nombre + ' de la lista'"
+                  (click)="ocultar(cliente.correo)">
+                  Ocultar
+                </button>
+              </td>
             </tr>
           }
         </tbody>
@@ -43,7 +66,7 @@
   </div>
 
   <div class="lista-movil" aria-label="Lista de clientes">
-    @for (cliente of clientes(); track cliente.correo) {
+    @for (cliente of clientesVisibles(); track cliente.correo) {
       <article class="cliente-movil">
         <header class="cliente-movil__cabecera">
           <span class="cliente-celda__avatar" aria-hidden="true">{{ iniciales(cliente.nombre) }}</span>
@@ -71,16 +94,32 @@
             <dd>{{ formatearFecha(cliente.ultimoPedido) }}</dd>
           </div>
         </dl>
+
+        <button
+          class="adm-btn adm-btn--fantasma adm-btn--sm adm-btn--bloque"
+          type="button"
+          [attr.aria-label]="'Ocultar a ' + cliente.nombre + ' de la lista'"
+          (click)="ocultar(cliente.correo)">
+          Ocultar de la lista
+        </button>
       </article>
     }
-    <p class="lista-movil__nota">El total entregado considera únicamente pedidos con estado «Entregado».</p>
+    <p class="lista-movil__nota">El total entregado considera únicamente pedidos con estado «Entregado». Ocultar solo retira al cliente de esta vista; no elimina sus pedidos.</p>
   </div>
 } @else {
   <div class="adm-card empty-state">
     <span class="empty-state__icono" aria-hidden="true">
       <span class="material-symbols-outlined">group</span>
     </span>
-    <h2>Aún no hay clientes</h2>
-    <p>Los clientes aparecerán aquí en cuanto registres su primer pedido.</p>
+    @if (totalOcultos() > 0) {
+      <h2>No hay clientes visibles</h2>
+      <p>Has ocultado {{ totalOcultos() }} cliente(s) de esta vista. Sus pedidos y datos siguen intactos.</p>
+      <button class="adm-btn adm-btn--fantasma" type="button" (click)="restaurarOcultos()">
+        Mostrar ocultos
+      </button>
+    } @else {
+      <h2>Aún no hay clientes</h2>
+      <p>Los clientes aparecerán aquí en cuanto registres su primer pedido.</p>
+    }
   </div>
 }

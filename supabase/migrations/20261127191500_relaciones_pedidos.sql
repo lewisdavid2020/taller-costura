@@ -85,7 +85,7 @@ create trigger set_orders_creado_por
 before insert on public.orders
 for each row execute function public.set_orders_creado_por();
 
--- Convierte una solicitud en pedido y marca la solicitud como convertida.
+-- Convierte una solicitud en pedido y marca la solicitud como confirmada.
 -- Todo ocurre en una sola transacción: si falla el pedido, la solicitud no cambia.
 create or replace function public.convertir_solicitud_en_pedido(
   p_solicitud_id uuid,
@@ -114,8 +114,8 @@ begin
     raise exception 'La solicitud no existe.';
   end if;
 
-  if v_solicitud.estado = 'convertida' then
-    raise exception 'La solicitud ya fue convertida en pedido.';
+  if v_solicitud.estado = 'confirmada' then
+    raise exception 'La solicitud ya fue confirmada en pedido.';
   end if;
 
   if p_total is null or p_total < 0 then
@@ -135,7 +135,7 @@ begin
   returning * into v_pedido;
 
   update public.solicitudes_cotizacion
-  set estado = 'convertida'
+  set estado = 'confirmada'
   where id = v_solicitud.id;
 
   return v_pedido;

@@ -583,6 +583,27 @@ select.adm-input {
 .auth-card__pie p { margin: 0; color: var(--adm-gris); font-size: 0.83rem; text-align: center; }
 .auth-card .adm-form { gap: 1rem; }
 .auth-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.auth-separador {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: var(--adm-gris);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.auth-separador::before,
+.auth-separador::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px dashed var(--adm-linea);
+}
+
+.auth-separador span { white-space: nowrap; }
+
 .auth-volver { margin-top: 1rem; }
 
 .auth-legal {

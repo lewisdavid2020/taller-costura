@@ -10,7 +10,7 @@ create table if not exists public.solicitudes_cotizacion (
   servicio text not null check (char_length(trim(servicio)) > 0),
   tipo_solicitud text not null default 'Cotización' check (char_length(trim(tipo_solicitud)) > 0),
   mensaje text not null default '' check (char_length(mensaje) <= 1000),
-  estado text not null default 'nueva' check (estado in ('nueva', 'contactada', 'convertida', 'descartada')),
+  estado text not null default 'nueva' check (estado in ('nueva', 'contactada', 'confirmada', 'cancelada')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

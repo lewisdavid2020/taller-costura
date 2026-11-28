@@ -50,6 +50,20 @@ describe('SolicitudesService', () => {
     expect(servicio.nuevas()).toBe(0);
   });
 
+  it('elimina todas las solicitudes canceladas', async () => {
+    const servicio = crearServicio();
+    await servicio.crear(datosSolicitud);
+    await servicio.crear({ ...datosSolicitud, correo: 'otra@taller.com' });
+    await servicio.cargar();
+
+    const primera = servicio.solicitudes()[0];
+    await servicio.cambiarEstado(primera.id, 'cancelada');
+
+    expect(await servicio.eliminarCanceladas()).toBe(1);
+    expect(servicio.solicitudes().length).toBe(1);
+    expect(servicio.solicitudes()[0].estado).toBe('nueva');
+  });
+
   it('empieza vacío cuando todavía no hay solicitudes', async () => {
     const servicio = crearServicio();
 

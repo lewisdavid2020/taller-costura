@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -20,6 +20,7 @@ export class LoginComponent {
   readonly tallerNombre = this.taller.datos;
   readonly mostrarContrasena = signal(false);
   readonly cargando = signal(false);
+  readonly cargandoGoogle = signal(false);
   readonly error = signal('');
   readonly aviso = signal('');
   readonly anio = new Date().getFullYear();
@@ -40,6 +41,27 @@ export class LoginComponent {
     } else if (parametros.get('registrado') === '1') {
       this.aviso.set('La cuenta de administrador quedó creada. Ya puedes iniciar sesión.');
     }
+
+    const errorOauth = parametros.get('error_description') ?? parametros.get('error');
+    if (errorOauth) {
+      this.error.set('No pudimos iniciar sesión con Google. Inténtalo de nuevo.');
+    }
+
+    effect(() => {
+      if (!this.auth.listo()) return;
+
+      const pendienteGoogle = sessionStorage.getItem('auth-google-pendiente') === '1';
+      if (this.auth.autenticado() && this.auth.esAdmin()) {
+        sessionStorage.removeItem('auth-google-pendiente');
+        void this.router.navigateByUrl(this.returnUrl);
+        return;
+      }
+
+      if (pendienteGoogle && !this.auth.autenticado()) {
+        sessionStorage.removeItem('auth-google-pendiente');
+        this.error.set('Tu cuenta de Google no tiene permisos de administrador.');
+      }
+    });
   }
 
   get correo() {
@@ -73,6 +95,21 @@ export class LoginComponent {
     this.aviso.set(
       'Por seguridad, la recuperación de acceso la gestiona el administrador del taller. Escríbele para restablecer tu contraseña.',
     );
+  }
+
+  async entrarConGoogle(): Promise<void> {
+    this.error.set('');
+    this.aviso.set('');
+    this.cargandoGoogle.set(true);
+    sessionStorage.setItem('auth-google-pendiente', '1');
+
+    const resultado = await this.auth.iniciarSesionConGoogle(this.returnUrl);
+    this.cargandoGoogle.set(false);
+
+    if (!resultado.ok) {
+      sessionStorage.removeItem('auth-google-pendiente');
+      this.error.set(resultado.error ?? 'No pudimos iniciar sesión con Google.');
+    }
   }
 
   async enviar(): Promise<void> {

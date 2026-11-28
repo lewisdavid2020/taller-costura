@@ -4,6 +4,12 @@
   [descripcion]="
     solicitudes().length + ' cotizaciones recibidas desde la página pública. Revisa el detalle y dales seguimiento.'
   ">
+  @if (canceladas().length > 0) {
+    <button class="adm-btn adm-btn--fantasma" type="button" (click)="limpiarCanceladas()">
+      <span class="material-symbols-outlined" aria-hidden="true">delete_sweep</span>
+      Limpiar canceladas ({{ canceladas().length }})
+    </button>
+  }
   <button
     class="adm-btn adm-btn--fantasma"
     type="button"
@@ -70,6 +76,7 @@
             <th scope="col">Estado</th>
             <th scope="col">Actualizar estado</th>
             <th scope="col">Pedido</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -114,7 +121,7 @@
                 </select>
               </td>
               <td>
-                @if (solicitud.estado === 'convertida') {
+                @if (solicitud.estado === 'confirmada') {
                   <span class="conversion__nota">Pedido creado</span>
                 } @else if (convirtiendo() === solicitud.id) {
                   <div class="conversion">
@@ -150,6 +157,15 @@
                 } @else if (puedeConvertir(solicitud)) {
                   <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="abrirConversion(solicitud)">
                     Convertir
+                  </button>
+                } @else {
+                  <span class="conversion__nota">—</span>
+                }
+              </td>
+              <td>
+                @if (solicitud.estado === 'cancelada') {
+                  <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="eliminar(solicitud)">
+                    Eliminar
                   </button>
                 } @else {
                   <span class="conversion__nota">—</span>
@@ -211,7 +227,7 @@
 
         <div class="solicitud-movil__estado">
           <span>Pedido</span>
-          @if (solicitud.estado === 'convertida') {
+          @if (solicitud.estado === 'confirmada') {
             <p class="conversion__nota">Pedido creado</p>
           } @else if (convirtiendo() === solicitud.id) {
             <div class="conversion">
@@ -247,6 +263,10 @@
           } @else if (puedeConvertir(solicitud)) {
             <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="abrirConversion(solicitud)">
               Convertir en pedido
+            </button>
+          } @else if (solicitud.estado === 'cancelada') {
+            <button class="adm-btn adm-btn--fantasma adm-btn--sm" type="button" (click)="eliminar(solicitud)">
+              Eliminar solicitud
             </button>
           } @else {
             <p class="conversion__nota">—</p>

@@ -78,10 +78,39 @@ export class SolicitudesService {
     return true;
   }
 
-  marcarConvertida(id: string): void {
+  async eliminar(id: string): Promise<boolean> {
+    if (!this.configurado) return false;
+    const { error } = await this.supabase.from('solicitudes_cotizacion').delete().eq('id', id);
+
+    if (error) return false;
+    this.solicitudesState.update((solicitudes) => solicitudes.filter((solicitud) => solicitud.id !== id));
+    return true;
+  }
+
+  /** Elimina todas las solicitudes canceladas de la lista. */
+  async eliminarCanceladas(): Promise<number> {
+    if (!this.configurado) return 0;
+    const total = this.solicitudesState().filter(
+      (solicitud) => solicitud.estado === 'cancelada',
+    ).length;
+    if (total === 0) return 0;
+
+    const { error } = await this.supabase
+      .from('solicitudes_cotizacion')
+      .delete()
+      .eq('estado', 'cancelada');
+
+    if (error) return 0;
+    this.solicitudesState.update((solicitudes) =>
+      solicitudes.filter((solicitud) => solicitud.estado !== 'cancelada'),
+    );
+    return total;
+  }
+
+  marcarConfirmada(id: string): void {
     this.solicitudesState.update((solicitudes) =>
       solicitudes.map((solicitud) =>
-        solicitud.id === id ? { ...solicitud, estado: 'convertida' } : solicitud,
+        solicitud.id === id ? { ...solicitud, estado: 'confirmada' } : solicitud,
       ),
     );
   }

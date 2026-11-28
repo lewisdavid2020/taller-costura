@@ -162,6 +162,9 @@ export class RequestsComponent {
 
   readonly solicitudes = this.servicio.solicitudes;
   readonly cargando = this.servicio.cargando;
+  readonly canceladas = computed(() =>
+    this.solicitudes().filter((solicitud) => solicitud.estado === 'cancelada'),
+  );
   readonly estados = ESTADOS_SOLICITUD;
   readonly filtro = signal<FiltroSolicitud>('todas');
   readonly convirtiendo = signal<string | null>(null);
@@ -225,7 +228,7 @@ export class RequestsComponent {
   }
 
   puedeConvertir(solicitud: SolicitudCotizacion): boolean {
-    return solicitud.estado !== 'convertida' && solicitud.estado !== 'descartada';
+    return solicitud.estado !== 'confirmada' && solicitud.estado !== 'cancelada';
   }
 
   async convertir(solicitud: SolicitudCotizacion): Promise<void> {
@@ -246,7 +249,7 @@ export class RequestsComponent {
       return;
     }
 
-    this.servicio.marcarConvertida(solicitud.id);
+    this.servicio.marcarConfirmada(solicitud.id);
     this.cancelarConversion();
     this.toast.mostrar(`Se creó el pedido ${pedido.folio} para ${solicitud.nombre}.`);
   }
@@ -266,5 +269,45 @@ export class RequestsComponent {
     this.toast.mostrar(
       `La solicitud de ${solicitud.nombre} ahora está ${ETIQUETA_SOLICITUD[estado].toLowerCase()}.`,
     );
+  }
+
+  async limpiarCanceladas(): Promise<void> {
+    const total = this.canceladas().length;
+    if (total === 0) return;
+
+    if (
+      !confirm(
+        `¿Eliminar ${total} solicitud(es) cancelada(s)? Esta acción no se puede deshacer.`,
+      )
+    ) {
+      return;
+    }
+
+    const eliminadas = await this.servicio.eliminarCanceladas();
+    if (eliminadas === 0) {
+      this.toast.mostrar('No pudimos limpiar las solicitudes canceladas.', 'error');
+      return;
+    }
+
+    this.toast.mostrar(`Se eliminaron ${eliminadas} solicitud(es) cancelada(s).`);
+  }
+
+  async eliminar(solicitud: SolicitudCotizacion): Promise<void> {
+    if (solicitud.estado !== 'cancelada') {
+      this.toast.mostrar('Solo puedes eliminar solicitudes canceladas.', 'error');
+      return;
+    }
+
+    if (!confirm(`¿Eliminar la solicitud de ${solicitud.nombre}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    const ok = await this.servicio.eliminar(solicitud.id);
+    if (!ok) {
+      this.toast.mostrar('No pudimos eliminar la solicitud.', 'error');
+      return;
+    }
+
+    this.toast.mostrar(`Se eliminó la solicitud de ${solicitud.nombre}.`);
   }
 }

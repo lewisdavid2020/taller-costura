@@ -16,6 +16,7 @@ interface PedidoFila {
   estado: EstadoPedido;
   solicitud_id?: string | null;
   creado_por?: string | null;
+  archivado?: boolean | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,9 +28,12 @@ export class OrdersService {
 
   readonly pedidos = this.pedidosState.asReadonly();
   readonly cargando = this.cargandoState.asReadonly();
+  readonly pedidosVisibles = computed(() => this.pedidosState().filter((pedido) => !pedido.archivado));
+  readonly archivados = computed(() => this.pedidosState().filter((pedido) => pedido.archivado));
 
   readonly recientes = computed(() =>
-    [...this.pedidosState()]
+    this.pedidosVisibles()
+      .slice()
       .sort((a, b) => b.fecha.localeCompare(a.fecha))
       .slice(0, 6),
   );
@@ -111,7 +115,7 @@ export class OrdersService {
     this.cargandoState.set(true);
     const { data, error } = await this.supabase
       .from('orders')
-      .select('id,folio,cliente,correo,telefono,servicio,fecha,entrega,total,estado,solicitud_id,creado_por')
+      .select('id,folio,cliente,correo,telefono,servicio,fecha,entrega,total,estado,solicitud_id,creado_por,archivado')
       .order('fecha', { ascending: false });
 
     this.cargandoState.set(false);
@@ -125,6 +129,33 @@ export class OrdersService {
     if (error) return false;
     this.pedidosState.update((pedidos) =>
       pedidos.map((pedido) => (pedido.id === id ? { ...pedido, estado } : pedido)),
+    );
+    return true;
+  }
+
+  /**
+   * "Elimina" un pedido entregado de la lista sin borrar el registro.
+   * El pedido archivado sigue contando en las métricas de ingresos.
+   */
+  async archivar(id: string): Promise<boolean> {
+    if (!this.configurado) return false;
+    const pedido = this.pedidosState().find((item) => item.id === id);
+    if (!pedido || pedido.estado !== 'entregado' || pedido.archivado) return false;
+
+    const { error } = await this.supabase.from('orders').update({ archivado: true }).eq('id', id);
+    if (error) return false;
+    this.pedidosState.update((pedidos) =>
+      pedidos.map((item) => (item.id === id ? { ...item, archivado: true } : item)),
+    );
+    return true;
+  }
+
+  async restaurar(id: string): Promise<boolean> {
+    if (!this.configurado) return false;
+    const { error } = await this.supabase.from('orders').update({ archivado: false }).eq('id', id);
+    if (error) return false;
+    this.pedidosState.update((pedidos) =>
+      pedidos.map((item) => (item.id === id ? { ...item, archivado: false } : item)),
     );
     return true;
   }
@@ -183,6 +214,7 @@ export class OrdersService {
       estado: fila.estado,
       solicitudId: fila.solicitud_id ?? undefined,
       creadoPor: fila.creado_por ?? undefined,
+      archivado: Boolean(fila.archivado),
     };
   }
 }

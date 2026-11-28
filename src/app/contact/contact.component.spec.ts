@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
 import { proveedoresSupabaseFake } from '../admin/core/testing/proveedores-fake';
 import { ContactComponent } from './contact.component';
@@ -22,7 +23,7 @@ describe('ContactComponent', () => {
   it('normaliza el WhatsApp internacional antes de crear el enlace', async () => {
     await TestBed.configureTestingModule({
       imports: [ContactComponent],
-      providers: [...proveedoresSupabaseFake()],
+      providers: [...proveedoresSupabaseFake(), provideRouter([])],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(ContactComponent);
