@@ -15,6 +15,6 @@
       {{ etiqueta }}
       <b>{{ precio }}</b>
     </span>
-    <a class="btn ghost sm" href="#contacto">Cotizar</a>
+    <a class="btn ghost sm" routerLink="/" fragment="contacto" [queryParams]="{ servicio: titulo }">Cotizar</a>
   </div>
 </article>

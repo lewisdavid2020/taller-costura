@@ -1,4 +1,5 @@
-import { Component, Input, inject, signal } from '@angular/core';
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SolicitudesService } from '../admin/core/solicitudes.service';
 import { enlaceWhatsapp } from './whatsapp';
@@ -9,8 +10,9 @@ import { enlaceWhatsapp } from './whatsapp';
   imports: [FormsModule],
   templateUrl: './contact.component.html',
 })
-export class ContactComponent {
+export class ContactComponent implements OnInit {
   private readonly solicitudes = inject(SolicitudesService);
+  private readonly route = inject(ActivatedRoute);
 
   @Input() nombreTaller = 'Julia Rosa Creaciones';
   @Input() whatsapp = '00000000000';
@@ -20,9 +22,18 @@ export class ContactComponent {
   readonly enviando = signal(false);
   readonly guardado = signal(false);
   readonly error = signal('');
+  readonly intentoEnvio = signal(false);
 
   cliente = { nombre: '', correo: '', telefono: '', servicio: '', mensaje: '' };
   tipoSolicitud = 'Cotización';
+
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const servicio = params.get('servicio')?.trim();
+      if (!servicio) return;
+      this.cliente.servicio = servicio;
+    });
+  }
 
   get enlaceWhatsApp(): string {
     const texto = `¡Hola! Quisiera cotizar un trabajo en ${this.nombreTaller}.`;
@@ -31,6 +42,7 @@ export class ContactComponent {
 
   enviar(): void {
     if (this.enviando()) return;
+    this.intentoEnvio.set(true);
 
     const nombre = this.cliente.nombre.trim();
     const correo = this.cliente.correo.trim();

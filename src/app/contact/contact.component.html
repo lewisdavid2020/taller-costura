@@ -45,9 +45,15 @@
           name="nombre"
           type="text"
           autocomplete="name"
-          placeholder="Ej. Carmen Rodríguez"
+          placeholder="Escriba su nomobre"
           [(ngModel)]="cliente.nombre"
-          required />
+          #nombre="ngModel"
+          required
+          [attr.aria-invalid]="(nombre.invalid && (nombre.touched || intentoEnvio())) ? 'true' : null"
+          [attr.aria-describedby]="(nombre.invalid && (nombre.touched || intentoEnvio())) ? 'contacto-nombre-error' : null" />
+        @if (nombre.invalid && (nombre.touched || intentoEnvio())) {
+          <span id="contacto-nombre-error" class="field-error">Escribe tu nombre para poder responderte.</span>
+        }
       </label>
 
       <div class="row">
@@ -58,9 +64,16 @@
             name="correo"
             type="email"
             autocomplete="email"
-            placeholder="Ej. carmen@correo.com"
+            placeholder="Ingrese su correo "
             [(ngModel)]="cliente.correo"
-            required />
+            #correo="ngModel"
+            required
+            email
+            [attr.aria-invalid]="(correo.invalid && (correo.touched || intentoEnvio())) ? 'true' : null"
+            [attr.aria-describedby]="(correo.invalid && (correo.touched || intentoEnvio())) ? 'contacto-correo-error' : null" />
+          @if (correo.invalid && (correo.touched || intentoEnvio())) {
+            <span id="contacto-correo-error" class="field-error">Escribe un correo válido para poder contactarte.</span>
+          }
         </label>
 
         <label for="contacto-telefono">
@@ -71,7 +84,7 @@
             type="tel"
             inputmode="tel"
             autocomplete="tel"
-            placeholder="Ej. 300 123 4567"
+            placeholder="Ingrese su telefono"
             [(ngModel)]="cliente.telefono" />
         </label>
       </div>
@@ -83,13 +96,22 @@
             id="contacto-servicio"
             name="servicio"
             [(ngModel)]="cliente.servicio"
-            required>
+            #servicio="ngModel"
+            required
+            [attr.aria-invalid]="(servicio.invalid && (servicio.touched || intentoEnvio())) ? 'true' : null"
+            [attr.aria-describedby]="(servicio.invalid && (servicio.touched || intentoEnvio())) ? 'contacto-servicio-error' : null">
             <option value="" disabled>Selecciona una opción...</option>
             @for (servicio of servicios; track servicio) {
               <option [value]="servicio">{{ servicio }}</option>
             }
+            @if (cliente.servicio && !servicios.includes(cliente.servicio) && cliente.servicio !== 'Otro tipo de costura especial') {
+              <option [value]="cliente.servicio">{{ cliente.servicio }}</option>
+            }
             <option value="Otro tipo de costura especial">Otro tipo de costura especial</option>
           </select>
+          @if (servicio.invalid && (servicio.touched || intentoEnvio())) {
+            <span id="contacto-servicio-error" class="field-error">Selecciona el servicio o producto que necesitas.</span>
+          }
         </label>
 
         <label for="contacto-tipo">
@@ -108,28 +130,30 @@
           id="contacto-mensaje"
           name="mensaje"
           rows="4"
-          placeholder="Ej. Necesito ajustar la basta de un pantalón de vestir y reducir la cintura..."
+          placeholder="Escribe aquí qué prenda es y qué necesitas..."
           [(ngModel)]="cliente.mensaje"></textarea>
       </label>
 
-      <button class="btn" type="submit" [disabled]="f.invalid || enviando() || (enviado() && guardado())">
-        {{ enviando() ? 'Enviando…' : 'Enviar cotización por WhatsApp' }}
+      <button class="btn" type="submit" [disabled]="enviando() || (enviado() && guardado())">
+        {{ enviando() ? 'Enviando…' : 'Enviar solicitud por WhatsApp' }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
 
-      @if (enviado() && guardado()) {
-        <p class="ok show" role="status">
-          Abrimos WhatsApp con tu mensaje listo para enviar y registramos tu solicitud en el panel del taller.
-        </p>
-      }
+      <div aria-live="polite" aria-atomic="true">
+        @if (enviado() && guardado()) {
+          <p class="ok show" role="status">
+            Abrimos WhatsApp con tu mensaje listo para enviar y registramos tu solicitud para que el taller pueda darte seguimiento.
+          </p>
+        }
 
-      @if (error()) {
-        <p class="error show" role="alert">{{ error() }}</p>
-      }
+        @if (error()) {
+          <p class="error show" role="alert">{{ error() }}</p>
+        }
+      </div>
 
-      <p class="note">Tu solicitud queda registrada para que el taller pueda darte seguimiento.</p>
+      <p class="note">Al enviar, abrimos WhatsApp con tu mensaje y registramos la solicitud en el panel del taller.</p>
     </form>
   </div>
 </section>

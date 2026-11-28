@@ -17,7 +17,12 @@
 
     <div class="producto-pie">
       <span class="producto-precio">{{ precioFormateado }}</span>
-      <a class="producto-enlace" href="#contacto" [attr.aria-label]="'Cotizar ' + nombre">
+      <a
+        class="producto-enlace"
+        routerLink="/"
+        fragment="contacto"
+        [queryParams]="{ servicio: nombre }"
+        [attr.aria-label]="'Cotizar ' + nombre">
         Cotizar <span aria-hidden="true">→</span>
       </a>
     </div>

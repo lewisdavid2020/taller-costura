@@ -5,6 +5,7 @@ npm-debug.log*
 
 /.taste-skill
 /.opencode
+/.agents
 
 # Copia local de desarrollo (en GitHub la app vive en la raíz)
 /taller-costura/
